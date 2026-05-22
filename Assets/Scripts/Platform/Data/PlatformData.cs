@@ -2,9 +2,16 @@
 
 namespace Game.Level.Data
 {
-    [CreateAssetMenu(fileName = "New Platform Data", menuName = "Game/Level/Platforms", order = 0)]
+    [CreateAssetMenu(fileName = "New Platform Data", menuName = "Game/Level/Platform", order = 0)]
     public class PlatformData : ScriptableObject
     {
-        public GameObject platformVisual;
+        [SerializeField] 
+        public PlatformColor Color = PlatformColor.Neutral;
+        
+        [SerializeField] 
+        public GameObject PlatformPrefab;
+        
+        [SerializeField] 
+        public bool UseMeshCollider;
     }
 }
