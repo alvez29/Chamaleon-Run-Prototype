@@ -9,6 +9,7 @@ namespace Game.Player
         [SerializeField] private PlayerStats m_stats;
         [SerializeField] private PlayerInputHandler m_inputHandler;
         [SerializeField] private PlayerGroundDetector m_groundDetector;
+        [SerializeField] private bool m_autoRun;
         
         private Rigidbody m_playerBody;
         private bool m_canDoubleJump;
@@ -39,7 +40,7 @@ namespace Game.Player
         {
             if (!m_stats) return;
             
-            m_playerBody.velocity = new Vector3(m_stats.runSpeed, m_playerBody.velocity.y, .0f);
+            if (m_autoRun) m_playerBody.velocity = new Vector3(m_stats.runSpeed, m_playerBody.velocity.y, .0f);
 
             switch (m_playerBody.velocity.y)
             {

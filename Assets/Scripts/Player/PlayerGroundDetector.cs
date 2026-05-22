@@ -12,17 +12,11 @@ namespace Game.Player
         private void FixedUpdate()
         {
             if (!m_stats) return;
-
+            
             Vector3 origin = transform.position + m_stats.groundCheckOffset;
-
-            IsGrounded = Physics.SphereCast(
-                origin,
-                m_stats.groundCheckRadius,
-                Vector3.down,
-                out RaycastHit hit,
-                m_stats.groundCheckDistance,
-                m_stats.groundLayer
-            );
+            Vector3 sphereCenter = origin + (Vector3.down * m_stats.groundCheckDistance);
+            
+            IsGrounded = Physics.CheckSphere(sphereCenter, m_stats.groundCheckRadius, m_stats.groundLayer); 
         }
 
         private void OnDrawGizmosSelected()
