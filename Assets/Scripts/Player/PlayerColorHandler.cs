@@ -1,10 +1,10 @@
 using System;
-using Level;
+using Game.Level;
 using UnityEngine;
 
 namespace Game.Player
 {
-    public class PlayerColorSwitcher : MonoBehaviour
+    public class PlayerColorHandler : MonoBehaviour
     {
         public event Action<PlatformColor> OnColorSwitched; 
         
@@ -34,17 +34,6 @@ namespace Game.Player
             if (m_playerInputHandler == null) return;
 
             m_playerInputHandler.OnSwitchColorStarted -= SwitchColor;
-        }
-
-        public void SetColor(PlatformColor color)
-        {
-            if (color == PlatformColor.Yellow)
-                isYellow = true;
-            else if (color == PlatformColor.Blue)
-                isYellow = false;
-            else return;
-            
-            UpdateMaterial(m_visuals, CurrentColor);
         }
         
         private void SwitchColor()
