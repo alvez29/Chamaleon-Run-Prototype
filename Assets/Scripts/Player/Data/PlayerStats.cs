@@ -6,22 +6,22 @@ namespace Game.Player.Data
     public class PlayerStats : ScriptableObject
     {
         [Header("Movement")]
-        public float runSpeed = 10f;
+        public float RunSpeed = 10f;
 
         [Header("Jumping")]
-        public float initialJumpForce = 12f;
-        public float doubleJumpForce = 8f;
+        public float InitialJumpForce = 12f;
+        public float DoubleJumpForce = 8f;
         
         [Tooltip("Multiplier applied to gravity when falling to make the jump feel heavier/faster.")]
-        public float fallMultiplier = 2.5f;
+        public float FallMultiplier = 2.5f;
         
         [Tooltip("Multiplier applied to gravity when the jump button is released early (variable jump).")]
-        public float lowJumpMultiplier = 2f;
+        public float LowJumpMultiplier = 2f;
 
         [Header("Ground Detection")]
-        public float groundCheckDistance = 0.1f;
-        public float groundCheckRadius = 0.3f;
-        public Vector3 groundCheckOffset = Vector3.up * 0.1f;
-        public LayerMask groundLayer;
+        public float GroundCheckDistance = 0.1f;
+        public float GroundCheckRadius = 0.3f;
+        public Vector3 GroundCheckOffset = Vector3.up * 0.1f;
+        public LayerMask GroundLayer;
     }
 }
