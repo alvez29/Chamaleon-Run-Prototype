@@ -1,4 +1,4 @@
-namespace Level
+namespace Game.Level
 {
     public enum PlatformColor
     {
