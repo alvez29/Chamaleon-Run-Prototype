@@ -13,18 +13,18 @@ namespace Game.Player
         {
             if (!m_stats) return;
             
-            Vector3 origin = transform.position + m_stats.groundCheckOffset;
-            Vector3 sphereCenter = origin + (Vector3.down * m_stats.groundCheckDistance);
+            Vector3 origin = transform.position + m_stats.GroundCheckOffset;
+            Vector3 sphereCenter = origin + (Vector3.down * m_stats.GroundCheckDistance);
             
-            IsGrounded = Physics.CheckSphere(sphereCenter, m_stats.groundCheckRadius, m_stats.groundLayer); 
+            IsGrounded = Physics.CheckSphere(sphereCenter, m_stats.GroundCheckRadius, m_stats.GroundLayer); 
         }
 
         private void OnDrawGizmosSelected()
         {
             Gizmos.color = IsGrounded ? Color.green : Color.red;
-            Vector3 origin = transform.position + m_stats?.groundCheckOffset ?? Vector3.zero;
-            Gizmos.DrawWireSphere(origin + Vector3.down * m_stats?.groundCheckDistance ?? Vector3.zero,
-                m_stats?.groundCheckRadius ?? 0.0f);
+            Vector3 origin = transform.position + m_stats?.GroundCheckOffset ?? Vector3.zero;
+            Gizmos.DrawWireSphere(origin + Vector3.down * m_stats?.GroundCheckDistance ?? Vector3.zero,
+                m_stats?.GroundCheckRadius ?? 0.0f);
         }
     }
 }

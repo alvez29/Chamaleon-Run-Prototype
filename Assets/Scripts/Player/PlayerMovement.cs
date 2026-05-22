@@ -40,7 +40,7 @@ namespace Game.Player
         {
             if (!m_stats) return;
             
-            if (m_autoRun) m_playerBody.velocity = new Vector3(m_stats.runSpeed, m_playerBody.velocity.y, .0f);
+            if (m_autoRun) m_playerBody.velocity = new Vector3(m_stats.RunSpeed, m_playerBody.velocity.y, .0f);
 
             switch (m_playerBody.velocity.y)
             {
@@ -56,12 +56,12 @@ namespace Game.Player
 
         private static void HandleFallingUpdate(Rigidbody body, PlayerStats stats)
         {
-            body.velocity += Vector3.up * (Physics.gravity.y * (stats.fallMultiplier - 1f) * Time.fixedDeltaTime);
+            body.velocity += Vector3.up * (Physics.gravity.y * (stats.FallMultiplier - 1f) * Time.fixedDeltaTime);
         }
 
         private static void HandleJumpingUpdate(Rigidbody body, PlayerStats stats)
         {
-            body.velocity += Vector3.up * (Physics.gravity.y * (stats.lowJumpMultiplier - 1f) * Time.fixedDeltaTime);
+            body.velocity += Vector3.up * (Physics.gravity.y * (stats.LowJumpMultiplier - 1f) * Time.fixedDeltaTime);
         }
         
         private void HandleJumpStarted()
@@ -70,13 +70,13 @@ namespace Game.Player
             
             if (m_groundDetector.IsGrounded)
             {
-                m_playerBody.velocity = new Vector3(m_playerBody.velocity.x, m_stats.initialJumpForce, .0f);
+                m_playerBody.velocity = new Vector3(m_playerBody.velocity.x, m_stats.InitialJumpForce, .0f);
                 m_canDoubleJump = true;
                 m_isJumpCanceled = false;
             }
             else if (m_canDoubleJump)
             {
-                m_playerBody.velocity = new Vector3(m_playerBody.velocity.x, m_stats.doubleJumpForce, .0f);
+                m_playerBody.velocity = new Vector3(m_playerBody.velocity.x, m_stats.DoubleJumpForce, .0f);
                 m_canDoubleJump = false;
                 m_isJumpCanceled = false;
             }
