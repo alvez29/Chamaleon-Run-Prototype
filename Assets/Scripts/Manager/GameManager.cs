@@ -1,5 +1,4 @@
-﻿using Game.Player;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Game.Manager
 {
@@ -20,8 +19,5 @@ namespace Game.Manager
         }
         
         [SerializeField] private GameObject m_player;
-        private PlayerColorHandler m_playerColorHandler;
-        
-        public PlayerColorHandler PlayerColorHandler => m_playerColorHandler;
     }
 }
