@@ -6,7 +6,7 @@ namespace Game.Level.Data
     public class PlatformData : ScriptableObject
     {
         [SerializeField] 
-        public PlatformColor Color = PlatformColor.Neutral;
+        public PlatformColor Color = PlatformColor.Black;
         
         [SerializeField] 
         public GameObject PlatformPrefab;

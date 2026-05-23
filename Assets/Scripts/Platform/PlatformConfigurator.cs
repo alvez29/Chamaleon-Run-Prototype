@@ -89,7 +89,7 @@ namespace Game.Level
                 case PlatformColor.Yellow:
                     subject.tag = Constants.YELLOW_PLATFORM_TAG;
                     break;
-                case PlatformColor.Neutral:
+                case PlatformColor.Black:
                 default:
                     subject.tag = "Untagged";
                     break;

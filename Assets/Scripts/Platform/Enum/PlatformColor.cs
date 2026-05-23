@@ -4,6 +4,6 @@ namespace Game.Level
     {
         Blue,
         Yellow,
-        Neutral
+        Black
     }
 }

@@ -27,7 +27,7 @@ namespace Game.Player
         
         private void OnTriggerEnter(Collider other)
         {
-            PlatformColor currentColor = m_playerColorHandler?.CurrentColor ?? PlatformColor.Neutral;
+            PlatformColor currentColor = m_playerColorHandler?.CurrentColor ?? PlatformColor.Black;
 
             if (IsValidColor(currentColor, other.gameObject.tag) && m_playerColorHandler)
             {
@@ -45,7 +45,7 @@ namespace Game.Player
             {
                 case PlatformColor.Blue when platformTag.Equals(Constants.BLUE_PLATFORM_TAG):
                 case PlatformColor.Yellow when platformTag.Equals(Constants.YELLOW_PLATFORM_TAG):
-                case PlatformColor.Neutral:
+                case PlatformColor.Black:
                     return true;
                 default:
                     return false;
