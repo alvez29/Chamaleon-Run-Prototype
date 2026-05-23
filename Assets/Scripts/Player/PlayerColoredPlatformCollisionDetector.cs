@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Game.Level;
@@ -12,6 +12,7 @@ namespace Game.Player
         public event Action OnPlayerCollidedPlatformWithIncorrectColor;
         
         [SerializeField] private PlayerColorHandler m_playerColorHandler;
+        [SerializeField] private LayerMask m_platformLayer;
         
         private Dictionary<int, string> m_platformsCache = new();
 
@@ -27,6 +28,11 @@ namespace Game.Player
         
         private void OnTriggerEnter(Collider other)
         {
+            if (((1 << other.gameObject.layer) & m_platformLayer) == 0)
+            {
+                return;
+            }
+
             PlatformColor currentColor = m_playerColorHandler?.CurrentColor ?? PlatformColor.Black;
 
             if (IsValidColor(currentColor, other.gameObject.tag) && m_playerColorHandler)

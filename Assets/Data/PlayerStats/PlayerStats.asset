@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59490d9f90c11ea449a4b001deb3c3ab, type: 3}
   m_Name: PlayerStats
   m_EditorClassIdentifier: 
-  RunSpeed: 32.3
+  RunSpeed: 25
   RunAcceleration: 4.8
   InitialJumpHeight: 6.4
   DoubleJumpHeight: 6.4
