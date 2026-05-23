@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 200797343106250274}
   - component: {fileID: 1773863172702685687}
   - component: {fileID: 3723638955787468261}
+  - component: {fileID: 886935569281709222}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -154,6 +155,7 @@ MonoBehaviour:
   m_inputHandler: {fileID: 4045313743934128447}
   m_groundDetector: {fileID: 5668028811480700245}
   m_autoRun: 0
+  m_bouncePreventionMode: 0
 --- !u!114 &1773863172702685687
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -184,6 +186,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_playerColorHandler: {fileID: 1773863172702685687}
+--- !u!114 &886935569281709222
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4169206119968355761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 379f7c293ae7d91489a3f6c2e30ddb28, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_stats: {fileID: 11400000, guid: ae9b080add9199044b6d3faccb689bbc, type: 2}
+  m_simulateDoubleJump: 0
+  m_doubleJumpTime: 0
 --- !u!1001 &4902157396795389857
 PrefabInstance:
   m_ObjectHideFlags: 0

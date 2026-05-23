@@ -61,7 +61,9 @@ namespace Game.Level
 
         private void ClearVisuals()
         {
-            for (int i = 0; i < transform.childCount; i++)
+            // Siempre iterar de atrás hacia adelante al destruir hijos, 
+            // de lo contrario los índices cambian y te saltas elementos, provocando duplicados.
+            for (int i = transform.childCount - 1; i >= 0; i--)
             {
                 Transform child = transform.GetChild(i);
                 
