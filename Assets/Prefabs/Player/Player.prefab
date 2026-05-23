@@ -78,10 +78,10 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 63
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
@@ -201,6 +201,7 @@ MonoBehaviour:
   m_stats: {fileID: 11400000, guid: ae9b080add9199044b6d3faccb689bbc, type: 2}
   m_simulateDoubleJump: 0
   m_doubleJumpTime: 0
+  m_simulationSteps: 150
 --- !u!1001 &4902157396795389857
 PrefabInstance:
   m_ObjectHideFlags: 0
