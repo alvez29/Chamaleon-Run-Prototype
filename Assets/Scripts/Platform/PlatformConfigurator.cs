@@ -1,12 +1,27 @@
+using System.Collections.Generic;
 using Game.Level.Data;
 using Game.Utils;
+using UnityEditor;
 using UnityEngine;
 
 namespace Game.Level
 {
     public class PlatformConfigurator : MonoBehaviour
     {
-        [SerializeField] private PlatformData m_platformData;
+        [Header("Platform Settings")]
+        [SerializeField] private PlatformColor m_color = PlatformColor.Blue;
+        
+        [SerializeField] private bool m_useMeshCollider = false;
+
+        [SerializeField] [Range(0, 1000)] private int m_length = 6;
+        [SerializeField] [Range(0, 1000)] private int m_height = 2;
+        [SerializeField] [Range(0, 1000)] private int m_depth = 2;
+            
+        
+        [HideInInspector]
+        [SerializeField] private List<PlatformData> m_cachedBlocks = new();
+        
+        private Vector3Int m_size => new Vector3Int(m_length, m_height, m_depth);
         
         private void Awake()
         {
@@ -16,67 +31,181 @@ namespace Game.Level
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            if (m_platformData == null || Application.isPlaying)
-            {
-                return;
-            }
+            if (Application.isPlaying) return;
+            if (PrefabUtility.IsPartOfPrefabAsset(this)) return;
             
-            if (UnityEditor.PrefabUtility.IsPartOfPrefabAsset(this))
+            EditorApplication.delayCall += () =>
             {
-                return;
-            }
-            
-            UnityEditor.EditorApplication.delayCall += () =>
-            {
-                if (this == null)
-                {
-                    return;
-                }
-                
+                if (this == null) return;
+                UpdateCachedBlocks();
                 Configure();
             };
+        }
+
+        private void UpdateCachedBlocks()
+        {
+            m_cachedBlocks.Clear();
+            string[] guids = AssetDatabase.FindAssets("t:PlatformData");
+            
+            foreach (string guid in guids)
+            {
+                string path = AssetDatabase.GUIDToAssetPath(guid);
+                PlatformData data = AssetDatabase.LoadAssetAtPath<PlatformData>(path);
+                
+                if (data != null && data.Color == m_color && data.Dimensions != Vector3Int.zero && !data.UseMeshCollider)
+                {
+                    m_cachedBlocks.Add(data);
+                }
+            }
+            
+            m_cachedBlocks.Sort((a, b) => 
+            {
+                int volA = a.Dimensions.x * a.Dimensions.y * a.Dimensions.z;
+                int volB = b.Dimensions.x * b.Dimensions.y * b.Dimensions.z;
+                return volB.CompareTo(volA);
+            });
         }
 #endif
 
         [ContextMenu("Configure Platform")]
         public void Configure()
         {
-            if (m_platformData == null || m_platformData.PlatformPrefab == null)
-            {
-                return;
-            }
+            if (m_size.x <= 0 || m_size.y <= 0 || m_size.z <= 0) return;
+            if (m_cachedBlocks == null || m_cachedBlocks.Count == 0) return;
 
             ClearVisuals();
-
-            GameObject visual = Instantiate(m_platformData.PlatformPrefab, transform);
+            GenerateBlocks();
+            SetupSingleCollider();
             
-            visual.name = Constants.PLATFORM_VISUAL_GAME_OBJECT_NAME;
-            visual.transform.localPosition = Vector3.zero;
-            visual.transform.localRotation = Quaternion.identity;
-
-            SetTagByColor(gameObject, m_platformData.Color);
-            SetupCollider(visual, m_platformData.UseMeshCollider);
+            SetTagByColor(gameObject, m_color);
         }
 
+        private void GenerateBlocks()
+        {
+            int sizeX = m_size.x;
+            int sizeY = m_size.y;
+            int sizeZ = m_size.z;
+            
+            bool[,,] grid = new bool[sizeX, sizeY, sizeZ];
+            
+            // Corner inferior izquierdo frontal
+            // El pivote está en X=0 (menor X posible), centrado en Y y Z
+            Vector3 startCorner = new Vector3(0f, -sizeY / 2f, -sizeZ / 2f);
+
+            for (int x = 0; x < sizeX; x++)
+            {
+                for (int y = 0; y < sizeY; y++)
+                {
+                    for (int z = 0; z < sizeZ; z++)
+                    {
+                        if (grid[x, y, z]) continue;
+
+                        PlatformData bestFit = FindBestFit(grid, x, y, z, sizeX, sizeY, sizeZ);
+                        
+                        if (bestFit != null)
+                        {
+                            PlaceBlock(bestFit, grid, x, y, z, startCorner);
+                        }
+                    }
+                }
+            }
+        }
+
+        private PlatformData FindBestFit(bool[,,] grid, int startX, int startY, int startZ, int sizeX, int sizeY, int sizeZ)
+        {
+            foreach (PlatformData block in m_cachedBlocks)
+            {
+                Vector3Int dim = block.Dimensions;
+                
+                if (startX + dim.x > sizeX || startY + dim.y > sizeY || startZ + dim.z > sizeZ)
+                    continue;
+
+                bool canFit = true;
+                for (int i = 0; i < dim.x && canFit; i++)
+                {
+                    for (int j = 0; j < dim.y && canFit; j++)
+                    {
+                        for (int k = 0; k < dim.z && canFit; k++)
+                        {
+                            if (grid[startX + i, startY + j, startZ + k])
+                            {
+                                canFit = false;
+                            }
+                        }
+                    }
+                }
+
+                if (canFit) return block;
+            }
+            return null; // Si no hay piezas de 1x1x1, podrían quedar huecos
+        }
+
+        private void PlaceBlock(PlatformData data, bool[,,] grid, int x, int y, int z, Vector3 startCorner)
+        {
+            Vector3Int dim = data.Dimensions;
+            
+            // Marcar grid como ocupado
+            for (int i = 0; i < dim.x; i++)
+            for (int j = 0; j < dim.y; j++)
+            for (int k = 0; k < dim.z; k++)
+                grid[x + i, y + j, z + k] = true;
+
+            GameObject visual = Instantiate(data.PlatformPrefab, transform);
+            visual.name = Constants.PLATFORM_VISUAL_GAME_OBJECT_NAME;
+            
+            // Calculamos posición exacta basada en bounds para ignorar la posición del pivote del modelo
+            MeshFilter filter = visual.GetComponentInChildren<MeshFilter>();
+            if (filter != null && filter.sharedMesh != null)
+            {
+                Bounds bounds = filter.sharedMesh.bounds;
+                Vector3 targetMin = startCorner + new Vector3(x, y, z);
+                
+                // targetMin = localPosition + bounds.center - bounds.extents
+                // localPosition = targetMin - bounds.center + bounds.extents
+                visual.transform.localPosition = targetMin - bounds.center + bounds.extents;
+            }
+            else
+            {
+                // Fallback si no hay mesh
+                visual.transform.localPosition = startCorner + new Vector3(x + dim.x / 2f, y + dim.y / 2f, z + dim.z / 2f);
+            }
+            
+            visual.transform.localRotation = Quaternion.identity;
+        }
+
+        private void SetupSingleCollider()
+        {
+            if (m_useMeshCollider)
+            {
+                Debug.LogWarning("MeshCollider no está soportado en plataformas dinámicas compuestas.");
+            }
+
+            if (TryGetComponent(out MeshCollider meshCol))
+            {
+                if (Application.isPlaying) Destroy(meshCol);
+                else DestroyImmediate(meshCol);
+            }
+
+            BoxCollider boxCol = gameObject.GetComponent<BoxCollider>();
+            if (boxCol == null)
+            {
+                boxCol = gameObject.AddComponent<BoxCollider>();
+            }
+
+            // El centro del collider debe desplazarse en X porque el pivote está en X=0
+            boxCol.center = new Vector3(m_size.x / 2f, 0f, 0f);
+            boxCol.size = m_size;
+        }
 
         private void ClearVisuals()
         {
-            // Siempre iterar de atrás hacia adelante al destruir hijos, 
-            // de lo contrario los índices cambian y te saltas elementos, provocando duplicados.
             for (int i = transform.childCount - 1; i >= 0; i--)
             {
                 Transform child = transform.GetChild(i);
-                
                 if (child.name == Constants.PLATFORM_VISUAL_GAME_OBJECT_NAME)
                 {
-                    if (Application.isPlaying)
-                    {
-                        Destroy(child.gameObject);
-                    }
-                    else
-                    {
-                        DestroyImmediate(child.gameObject);
-                    }
+                    if (Application.isPlaying) Destroy(child.gameObject);
+                    else DestroyImmediate(child.gameObject);
                 }
             }
         }
@@ -95,52 +224,6 @@ namespace Game.Level
                 default:
                     subject.tag = "Untagged";
                     break;
-            }
-        }
-        
-        private void SetupCollider(GameObject visual, bool useMeshCollider)
-        {
-            MeshFilter filter = visual.GetComponentInChildren<MeshFilter>();
-            
-            if (filter == null || filter.sharedMesh == null)
-            {
-                return;
-            }
-            
-            if (useMeshCollider)
-            {
-                if (TryGetComponent(out BoxCollider box))
-                {
-                    if (Application.isPlaying) Destroy(box);
-                    else DestroyImmediate(box);
-                }
-                
-                MeshCollider meshCol = gameObject.GetComponent<MeshCollider>();
-                
-                if (meshCol == null)
-                {
-                    meshCol = gameObject.AddComponent<MeshCollider>();
-                }
-                
-                meshCol.sharedMesh = filter.sharedMesh;
-            }
-            else
-            {
-                if (TryGetComponent(out MeshCollider mesh))
-                {
-                    if (Application.isPlaying) Destroy(mesh);
-                    else DestroyImmediate(mesh);
-                }
-                
-                BoxCollider boxCol = gameObject.GetComponent<BoxCollider>();
-                
-                if (boxCol == null)
-                {
-                    boxCol = gameObject.AddComponent<BoxCollider>();
-                }
-                
-                boxCol.center = filter.sharedMesh.bounds.center;
-                boxCol.size = filter.sharedMesh.bounds.size;
             }
         }
     }
