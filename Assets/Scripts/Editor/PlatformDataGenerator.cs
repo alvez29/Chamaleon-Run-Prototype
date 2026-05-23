@@ -13,12 +13,14 @@ namespace Game.Editor
         {
             string bluePath = "Assets/Art/KayKit/Platformers/Platforms/Blue/Models";
             string yellowPath = "Assets/Art/KayKit/Platformers/Platforms/Yellow/Models";
+            string blackPath = "Assets/Art/KayKit/Platformers/Platforms/Black/Models";
             string outputFolder = "Assets/Data/Platforms";
 
             EnsureFolderExists(outputFolder);
 
             ProcessFolder(bluePath, PlatformColor.Blue, outputFolder);
             ProcessFolder(yellowPath, PlatformColor.Yellow, outputFolder);
+            ProcessFolder(blackPath, PlatformColor.Black, outputFolder);
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
