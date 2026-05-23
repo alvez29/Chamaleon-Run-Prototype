@@ -4,7 +4,7 @@ namespace Game.Level.Collectibles
 {
     public class ImpulseCollectible : Collectible
     {
-        [SerializeField] private float m_horizontalForceStrength = 2;
+        [SerializeField] private float m_horizontalForceStrength = 3000;
         
         protected override void OnCollected(GameObject other)
         {
@@ -12,7 +12,9 @@ namespace Game.Level.Collectibles
 
             if (playerRigidBody != null)
             {
-                playerRigidBody.AddForce(new Vector3(m_horizontalForceStrength, 0.0f, 0.0f), ForceMode.Force);    
+                Debug.Log("Impulse collectible collected!");
+                playerRigidBody.AddForce(new Vector3(m_horizontalForceStrength, 0.0f, 0.0f), ForceMode.Force);
+                Destroy(gameObject);
             }
             
         }
