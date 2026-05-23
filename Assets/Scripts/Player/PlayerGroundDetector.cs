@@ -1,3 +1,4 @@
+using System;
 using Game.Player.Data;
 using UnityEngine;
 
@@ -5,18 +6,25 @@ namespace Game.Player
 {
     public class PlayerGroundDetector : MonoBehaviour
     {
+        public event Action OnGroundDetected;
+        
         [SerializeField] private PlayerStats m_stats;
 
         public bool IsGrounded { get; private set; }
 
-        private void FixedUpdate()
+        public void CheckGround()
         {
             if (!m_stats) return;
+
+            bool lastGroundedState = IsGrounded;
             
             Vector3 origin = transform.position + m_stats.GroundCheckOffset;
             Vector3 sphereCenter = origin + (Vector3.down * m_stats.GroundCheckDistance);
             
-            IsGrounded = Physics.CheckSphere(sphereCenter, m_stats.GroundCheckRadius, m_stats.GroundLayer); 
+            IsGrounded = Physics.CheckSphere(sphereCenter, m_stats.GroundCheckRadius, m_stats.GroundLayer);
+            
+            if (lastGroundedState != IsGrounded && IsGrounded)
+                OnGroundDetected?.Invoke();
         }
 
         private void OnDrawGizmosSelected()
