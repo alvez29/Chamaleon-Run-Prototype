@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Color: 1
   PlatformPrefab: {fileID: 919132149155446097, guid: 9df547ad60ce61241981e2e9708aaf59, type: 3}
+  Dimensions: {x: 3, y: 1, z: 1}
   UseMeshCollider: 0

@@ -45,6 +45,7 @@ namespace Game.Editor
                     if (modelPrefab == null) continue;
 
                     bool isSlope = fileName.Contains("_slope_");
+                    Vector3Int dimensions = GetDimensionsFromFileName(fileName);
 
                     PlatformData newData = ScriptableObject.CreateInstance<PlatformData>();
                     SerializedObject serializedObject = new SerializedObject(newData);
@@ -52,6 +53,7 @@ namespace Game.Editor
                     serializedObject.FindProperty("Color").enumValueIndex = (int)color;
                     serializedObject.FindProperty("PlatformPrefab").objectReferenceValue = modelPrefab;
                     serializedObject.FindProperty("UseMeshCollider").boolValue = isSlope;
+                    serializedObject.FindProperty("Dimensions").vector3IntValue = dimensions;
                     
                     serializedObject.ApplyModifiedProperties();
 
@@ -63,6 +65,31 @@ namespace Game.Editor
             }
         }
 
+        private static Vector3Int GetDimensionsFromFileName(string filePath)
+        {
+            string[] parts = filePath.Split('_');
+
+            foreach (string part in parts)
+            {
+                if (part.Contains("x"))
+                {
+                    string numbers = System.Text.RegularExpressions.Regex
+                        .Match(part, @"\d+x\d+x\d+")
+                        .Value;
+
+                    string[] values = numbers.Split('x');
+
+                    int x = int.Parse(values[0]);
+                    int y = int.Parse(values[2]);
+                    int z = int.Parse(values[1]);
+
+                    return new Vector3Int(x, y, z);
+                }
+            }
+
+            return Vector3Int.zero;
+        }
+        
         private static string ToPascalCase(string str)
         {
             string[] parts = str.Split('_');

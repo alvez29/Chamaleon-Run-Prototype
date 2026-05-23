@@ -11,6 +11,9 @@ namespace Game.Level.Data
         [SerializeField] 
         public GameObject PlatformPrefab;
         
+        [SerializeField]
+        public Vector3Int Dimensions = Vector3Int.one;
+        
         [SerializeField] 
         public bool UseMeshCollider;
     }
