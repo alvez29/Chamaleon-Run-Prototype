@@ -51,7 +51,6 @@ namespace Game.Player
             if (m_inputHandler == null) return;
             
             m_inputHandler.OnJumpStarted += HandleJumpStarted;
-            m_inputHandler.OnJumpCanceled += HandleJumpCanceled;
         }
 
         private void OnDisable()
@@ -59,7 +58,6 @@ namespace Game.Player
             if (m_inputHandler == null) return;
             
             m_inputHandler.OnJumpStarted -= HandleJumpStarted;
-            m_inputHandler.OnJumpCanceled -= HandleJumpCanceled;
         }
         
         private void OnDestroy()
@@ -71,33 +69,42 @@ namespace Game.Player
         private void FixedUpdate()
         {
             if (!m_stats) return;
-
-            m_groundDetector.CheckGround();
+            
+            m_groundDetector.CheckGround(m_stats.GroundCheckOffset, m_stats.GroundCheckDistance, m_stats.GroundLayer);
             
             if (m_autoRun)
             {
                 ProcessAutoRun(m_playerBody, m_stats.RunSpeed, m_stats.RunAcceleration);
             }
+            
+            ProcessGravity(m_playerBody);
+        }
 
-            switch (m_playerBody.velocity.y)
+        private void ProcessGravity(Rigidbody playerBody)
+        {
+            if (m_groundDetector.IsGrounded) return;
+            
+            bool isFalling = m_playerBody.velocity.y < 0;
+            bool isJumping = m_playerBody.velocity.y > 0;
+            Vector3 gravity = Vector3.down * m_stats.BaseGravity;
+            
+            if (isFalling || m_isJumpCanceled)
             {
-                case < 0:
-                    HandleFallingUpdate(m_playerBody, m_stats);
-                    break;
-                case > 0 when m_isJumpCanceled:
-                    HandleJumpingUpdate(m_playerBody, m_stats);
-                    break;
+                gravity *= m_stats.FallGravityFactor;
             }
-        }
+            else if (isJumping)
+            {
+                if (m_inputHandler.IsJumpPressed)
+                {
+                    gravity *= m_stats.JumpGravityFactor;
+                }
+                else
+                {
+                    gravity *= m_stats.FallGravityFactor;
+                }
+            }
 
-        private static void HandleFallingUpdate(Rigidbody body, PlayerStats stats)
-        {
-            body.velocity += Vector3.up * (Physics.gravity.y * (stats.FallMultiplier - 1f) * Time.fixedDeltaTime);
-        }
-
-        private static void HandleJumpingUpdate(Rigidbody body, PlayerStats stats)
-        {
-            body.velocity += Vector3.up * (Physics.gravity.y * (stats.LowJumpMultiplier - 1f) * Time.fixedDeltaTime);
+            playerBody.AddForce(gravity, ForceMode.Force);
         }
         
         private void HandleJumpStarted()
@@ -106,19 +113,19 @@ namespace Game.Player
             
             if (m_jumpsRemaining > 0)
             {
-                float jumpForce = m_jumpsRemaining == Constants.MAX_PLAYER_JUMPS ? m_stats.InitialJumpForce : m_stats.DoubleJumpForce;
+                float jumpHeight = m_jumpsRemaining == 2 ? m_stats.InitialJumpHeight : m_stats.DoubleJumpHeight;
+                
+                // Gravedad efectiva mientras saltas (contemplando si el Rigidbody tiene Use Gravity activado o no)
+                float unityGravity = m_playerBody.useGravity ? Physics.gravity.y : 0f;
+                float effectiveUpGravity = unityGravity - (m_stats.BaseGravity * m_stats.JumpGravityFactor);
+                
+                float jumpForce = Mathf.Sqrt(jumpHeight * -2f * effectiveUpGravity * m_playerBody.mass);
                 
                 m_playerBody.velocity = new Vector3(m_playerBody.velocity.x, 0f, m_playerBody.velocity.z);
-                m_playerBody.AddForce(Vector3.up * jumpForce, ForceMode.VelocityChange);
+                m_playerBody.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
                 
                 m_jumpsRemaining--;
-                m_isJumpCanceled = false;
             }
-        }
-
-        private void HandleJumpCanceled()
-        {
-            m_isJumpCanceled = true;
         }
 
         private void OnGroundDetectorDetectedGround()

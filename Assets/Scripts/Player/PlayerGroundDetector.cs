@@ -12,22 +12,22 @@ namespace Game.Player
 
         public bool IsGrounded { get; private set; }
 
-        public void CheckGround()
+        public void CheckGround(Vector3 groundCheckOffset, float groundCheckRadius, LayerMask groundLayer)
         {
             if (!m_stats) return;
 
             bool lastGroundedState = IsGrounded;
             
-            Vector3 origin = transform.position + m_stats.GroundCheckOffset;
-            Vector3 sphereCenter = origin + (Vector3.down * m_stats.GroundCheckDistance);
+            Vector3 origin = transform.position + groundCheckOffset;
+            Vector3 sphereCenter = origin + (Vector3.down * groundCheckRadius);
             
-            IsGrounded = Physics.CheckSphere(sphereCenter, m_stats.GroundCheckRadius, m_stats.GroundLayer);
+            IsGrounded = Physics.CheckSphere(sphereCenter, groundCheckRadius, groundLayer);
             
             if (lastGroundedState != IsGrounded && IsGrounded)
                 OnGroundDetected?.Invoke();
         }
 
-        private void OnDrawGizmosSelected()
+        private void OnDrawGizmos()
         {
             Gizmos.color = IsGrounded ? Color.green : Color.red;
             Vector3 origin = transform.position + m_stats?.GroundCheckOffset ?? Vector3.zero;
