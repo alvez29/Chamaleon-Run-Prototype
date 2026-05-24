@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Game.Level.Data;
 using Game.Utils;
 using UnityEditor;
@@ -6,20 +7,22 @@ using UnityEngine;
 
 namespace Game.Level
 {
-    public class PlatformConfigurator : MonoBehaviour
+    public class BoxPlatformConfigurator : MonoBehaviour
     {
         [Header("Platform Settings")]
         [SerializeField] private PlatformColor m_color = PlatformColor.Blue;
         
-        [SerializeField] private bool m_useMeshCollider = false;
+        [SerializeField] private bool m_useMeshCollider;
 
         [SerializeField] [Range(0, 1000)] private int m_length = 6;
         [SerializeField] [Range(0, 1000)] private int m_height = 2;
         [SerializeField] [Range(0, 1000)] private int m_depth = 2;
-            
+        [SerializeField] private PlatformData.PlatformType m_platformTypeUsed = PlatformData.PlatformType.Squared;
         
         [HideInInspector]
         [SerializeField] private List<PlatformData> m_cachedBlocks = new();
+        
+        
         
         private Vector3Int m_size => new Vector3Int(m_length, m_height, m_depth);
         
@@ -46,18 +49,13 @@ namespace Game.Level
         {
             m_cachedBlocks.Clear();
             string[] guids = AssetDatabase.FindAssets("t:PlatformData");
+            PlatformData[] platformsData = guids
+                .Select(guid => AssetDatabase.LoadAssetAtPath<PlatformData>(AssetDatabase.GUIDToAssetPath(guid)))
+                .Where(data => data != null && data.Color == m_color && data.Dimensions != Vector3Int.zero &&
+                               !data.UseMeshCollider && data.Type == m_platformTypeUsed)
+                .ToArray();
             
-            foreach (string guid in guids)
-            {
-                string path = AssetDatabase.GUIDToAssetPath(guid);
-                PlatformData data = AssetDatabase.LoadAssetAtPath<PlatformData>(path);
-                
-                if (data != null && data.Color == m_color && data.Dimensions != Vector3Int.zero && !data.UseMeshCollider)
-                {
-                    m_cachedBlocks.Add(data);
-                }
-            }
-            
+            m_cachedBlocks.AddRange(platformsData);
             m_cachedBlocks.Sort((a, b) => 
             {
                 int volA = a.Dimensions.x * a.Dimensions.y * a.Dimensions.z;
@@ -88,8 +86,6 @@ namespace Game.Level
             
             bool[,,] grid = new bool[sizeX, sizeY, sizeZ];
             
-            // Corner inferior izquierdo frontal
-            // El pivote está en X=0 (menor X posible), centrado en Y y Z
             Vector3 startCorner = new Vector3(0f, -sizeY / 2f, -sizeZ / 2f);
 
             for (int x = 0; x < sizeX; x++)
@@ -137,14 +133,13 @@ namespace Game.Level
 
                 if (canFit) return block;
             }
-            return null; // Si no hay piezas de 1x1x1, podrían quedar huecos
+            return null;
         }
 
         private void PlaceBlock(PlatformData data, bool[,,] grid, int x, int y, int z, Vector3 startCorner)
         {
             Vector3Int dim = data.Dimensions;
             
-            // Marcar grid como ocupado
             for (int i = 0; i < dim.x; i++)
             for (int j = 0; j < dim.y; j++)
             for (int k = 0; k < dim.z; k++)
@@ -153,20 +148,17 @@ namespace Game.Level
             GameObject visual = Instantiate(data.PlatformPrefab, transform);
             visual.name = Constants.PLATFORM_VISUAL_GAME_OBJECT_NAME;
             
-            // Calculamos posición exacta basada en bounds para ignorar la posición del pivote del modelo
             MeshFilter filter = visual.GetComponentInChildren<MeshFilter>();
+            
             if (filter != null && filter.sharedMesh != null)
             {
                 Bounds bounds = filter.sharedMesh.bounds;
                 Vector3 targetMin = startCorner + new Vector3(x, y, z);
                 
-                // targetMin = localPosition + bounds.center - bounds.extents
-                // localPosition = targetMin - bounds.center + bounds.extents
                 visual.transform.localPosition = targetMin - bounds.center + bounds.extents;
             }
             else
             {
-                // Fallback si no hay mesh
                 visual.transform.localPosition = startCorner + new Vector3(x + dim.x / 2f, y + dim.y / 2f, z + dim.z / 2f);
             }
             
@@ -192,7 +184,6 @@ namespace Game.Level
                 boxCol = gameObject.AddComponent<BoxCollider>();
             }
 
-            // El centro del collider debe desplazarse en X porque el pivote está en X=0
             boxCol.center = new Vector3(m_size.x / 2f, 0f, 0f);
             boxCol.size = m_size;
         }
