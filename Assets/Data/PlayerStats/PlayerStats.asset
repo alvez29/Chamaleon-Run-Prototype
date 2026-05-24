@@ -16,7 +16,7 @@ MonoBehaviour:
   RunAcceleration: 4.8
   InitialJumpHeight: 6.4
   DoubleJumpHeight: 6.4
-  FallGravityFactor: 6
+  FallGravityFactor: 7
   JumpGravityFactor: 3
   BaseGravity: 9.8
   GroundCheckDistance: 0.1
