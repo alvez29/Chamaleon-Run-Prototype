@@ -36,24 +36,32 @@ namespace Game.Editor
 
             foreach (string guid in guids)
             {
+                PlatformData newData = ScriptableObject.CreateInstance<PlatformData>();
+                SerializedObject serializedObject = new SerializedObject(newData);
+                
                 string assetPath = AssetDatabase.GUIDToAssetPath(guid);
                 string fileName = Path.GetFileNameWithoutExtension(assetPath).ToLower();
+                Vector3Int dimensions = GetDimensionsFromFileName(fileName);
 
-                if (fileName.StartsWith("barrier") || fileName.StartsWith("platform"))
+                GameObject modelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
+                if (modelPrefab == null) continue;
+
+                bool shouldProcess = fileName.StartsWith("barrier") || fileName.StartsWith("platform");
+                
+                if (shouldProcess)
                 {
-                    GameObject modelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
-                    if (modelPrefab == null) continue;
-
-                    bool isSlope = fileName.Contains("_slope_");
-                    Vector3Int dimensions = GetDimensionsFromFileName(fileName);
-
-                    PlatformData newData = ScriptableObject.CreateInstance<PlatformData>();
-                    SerializedObject serializedObject = new SerializedObject(newData);
+                    bool isSlope = fileName.Contains("slope");
+                    bool isBarrier = fileName.Contains("barrier");
+                    bool isSquaredPlatform = System.Text.RegularExpressions.Regex
+                        .Match(fileName, @"^platform_\d+").Success;
+                    PlatformData.PlatformType platformType =
+                        GetPlatformType(serializedObject, isBarrier, isSlope, isSquaredPlatform);
                     
                     serializedObject.FindProperty("Color").enumValueIndex = (int)color;
                     serializedObject.FindProperty("PlatformPrefab").objectReferenceValue = modelPrefab;
                     serializedObject.FindProperty("UseMeshCollider").boolValue = isSlope;
                     serializedObject.FindProperty("Dimensions").vector3IntValue = dimensions;
+                    serializedObject.FindProperty("Type").enumValueIndex = (int)platformType;
                     
                     serializedObject.ApplyModifiedProperties();
 
@@ -62,6 +70,27 @@ namespace Game.Editor
 
                     AssetDatabase.CreateAsset(newData, finalPath);
                 }
+            }
+
+            PlatformData.PlatformType GetPlatformType(SerializedObject serializedObject, bool isBarrier, bool isSlope, bool isSquaredPlatform)
+            {
+                if (isBarrier)
+                {
+                    return PlatformData.PlatformType.Barrier;
+                }
+
+                if (isSlope)
+                {
+                    return PlatformData.PlatformType.Slope;
+                }
+
+                if (isSquaredPlatform)
+                {
+                    return PlatformData.PlatformType.Squared;    
+                }
+                
+                return PlatformData.PlatformType.NonRegistered;
+                
             }
         }
 

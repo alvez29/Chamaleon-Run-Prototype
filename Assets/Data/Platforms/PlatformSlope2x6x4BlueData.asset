@@ -16,3 +16,4 @@ MonoBehaviour:
   PlatformPrefab: {fileID: 919132149155446097, guid: ebd396c206e06084f8fbc4a187226b83, type: 3}
   Dimensions: {x: 2, y: 4, z: 6}
   UseMeshCollider: 1
+  Type: 1
