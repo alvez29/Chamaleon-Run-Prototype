@@ -20,6 +20,7 @@ namespace Game.Player
         [SerializeField] private PlayerStats m_stats;
         [SerializeField] private PlayerInputHandler m_inputHandler;
         [SerializeField] private PlayerGroundDetector m_groundDetector;
+        [SerializeField] private PlayerAnimationUpdater m_animationUpdater;
         [SerializeField] private bool m_autoRun;
         [SerializeField] private BouncePreventionMode m_bouncePreventionMode = BouncePreventionMode.Simple;
         
@@ -78,8 +79,9 @@ namespace Game.Player
             }
             
             ProcessGravity(m_playerBody);
+            m_animationUpdater.UpdateParameters(m_playerBody.velocity, m_groundDetector.IsGrounded);
         }
-
+        
         private void ProcessGravity(Rigidbody playerBody)
         {
             if (m_groundDetector.IsGrounded) return;
@@ -115,7 +117,6 @@ namespace Game.Player
             {
                 float jumpHeight = m_jumpsRemaining == 2 ? m_stats.InitialJumpHeight : m_stats.DoubleJumpHeight;
                 
-                // Gravedad efectiva mientras saltas (contemplando si el Rigidbody tiene Use Gravity activado o no)
                 float unityGravity = m_playerBody.useGravity ? Physics.gravity.y : 0f;
                 float effectiveUpGravity = unityGravity - (m_stats.BaseGravity * m_stats.JumpGravityFactor);
                 
