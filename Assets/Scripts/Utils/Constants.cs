@@ -1,4 +1,6 @@
-﻿namespace Game.Utils
+﻿using UnityEngine;
+
+namespace Game.Utils
 {
     public static class Constants
     {

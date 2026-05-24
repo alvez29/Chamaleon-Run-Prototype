@@ -10,10 +10,10 @@ namespace Game.Player
     public class PlayerColoredPlatformCollisionDetector : MonoBehaviour
     {
         public event Action OnPlayerCollidedPlatformWithIncorrectColor;
-        
+
         [SerializeField] private PlayerColorHandler m_playerColorHandler;
         [SerializeField] private LayerMask m_platformLayer;
-        
+
         private Dictionary<int, string> m_platformsCache = new();
 
         private void OnEnable()
@@ -25,7 +25,7 @@ namespace Game.Player
         {
             if (m_playerColorHandler != null) m_playerColorHandler.OnColorSwitched -= OnPlayerChangedColor;
         }
-        
+
         private void OnTriggerEnter(Collider other)
         {
             if (((1 << other.gameObject.layer) & m_platformLayer) == 0)
@@ -51,8 +51,8 @@ namespace Game.Player
             {
                 case PlatformColor.Blue when platformTag.Equals(Constants.BLUE_PLATFORM_TAG):
                 case PlatformColor.Yellow when platformTag.Equals(Constants.YELLOW_PLATFORM_TAG):
-                case PlatformColor.Black:
                     return true;
+                case PlatformColor.Black:
                 default:
                     return false;
             }
@@ -76,7 +76,6 @@ namespace Game.Player
 
         private void OnCollidedWithPlatformWithIncorrectColor()
         {
-            Debug.Log("Boom!");
             OnPlayerCollidedPlatformWithIncorrectColor?.Invoke();
         }
     }

@@ -36,6 +36,12 @@ namespace Game.Player
             m_playerInputHandler.OnSwitchColorStarted -= SwitchColor;
         }
         
+        public void SetColor(PlatformColor color)
+        {
+            isYellow = color == PlatformColor.Yellow;
+            UpdateMaterial(m_visuals, CurrentColor);
+        }
+        
         private void SwitchColor()
         {
             isYellow = !isYellow;

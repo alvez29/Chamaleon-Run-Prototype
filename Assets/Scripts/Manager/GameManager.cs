@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using Game.Level;
+using UnityEngine;
 
 namespace Game.Manager
 {
@@ -17,7 +19,10 @@ namespace Game.Manager
                 return m_instance;
             }
         }
+
+        private KillZoneBehaviour[] m_killzones;
         
         [SerializeField] private GameObject m_player;
+        [SerializeField] private LevelManager m_currentLevel;
     }
 }
