@@ -50,7 +50,7 @@ namespace Game.Player
         
         private void UpdateMaterial(Renderer[] visuals, PlatformColor color)
         {
-            Material materialToApply = isYellow ? m_yellowMaterial : m_blueMaterial;
+            Material materialToApply = color == PlatformColor.Yellow ? m_yellowMaterial : m_blueMaterial;
             
             foreach (Renderer model in visuals)
             {

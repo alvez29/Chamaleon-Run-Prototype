@@ -33,13 +33,13 @@ namespace Game.Level
 
         protected abstract void OnCollected(GameObject player);
 
-        private void Deactivate()
+        protected internal virtual void Deactivate()
         {
             m_isActivated = false;
             m_meshRenderer.enabled = false;
         }
 
-        public void Activate()
+        protected internal virtual void Activate()
         {
             m_isActivated = true;
             m_meshRenderer.enabled = true;

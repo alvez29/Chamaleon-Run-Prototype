@@ -10,11 +10,13 @@ namespace Game.Level
 {
     public class LevelManager : MonoBehaviour
     {
+        public event Action OnPlayerJustDied;
+        
         [Header("Components References")]
         [SerializeField] private GameObject m_nextLevelPrefab;
         [SerializeField] private GameObject m_player;
         [SerializeField] private Transform m_playerStartPoint;
-        [SerializeField] private PlayerMovement m_playerMovement;
+        
         [SerializeField] private PlatformColor m_initialPlatformColor = PlatformColor.Blue;
         [SerializeField] private TransitionManager m_transitionManager;
         [SerializeField] private TransitionManagerAnimatorSpeaker m_transitionManagerAnimatorSpeaker;
@@ -23,8 +25,11 @@ namespace Game.Level
         [SerializeField] private float m_loseTimeScale = 0.2f;
 
         private Collectible[] m_collectedCollectiblesCache = Array.Empty<Collectible>();
+        private Coroutine m_timeScaleCoroutine;
         
+        private PlayerInputHandler m_playerInputHandler;
         private PlayerColorHandler m_playerColorHandler;
+        private PlayerColoredPlatformCollisionDetector m_playerCollisionDetector;
         
         private void Awake()
         {
@@ -36,6 +41,7 @@ namespace Game.Level
             {
                 if (m_player.TryGetComponent(out PlayerColoredPlatformCollisionDetector collisionDetector))
                 {
+                    m_playerCollisionDetector = collisionDetector;
                     collisionDetector.OnPlayerCollidedPlatformWithIncorrectColor += OnLose;
                 }
                 else
@@ -44,7 +50,10 @@ namespace Game.Level
                         m_player.GetComponentInChildren<PlayerColoredPlatformCollisionDetector>();
 
                     if (childrenCollisionDetector != null)
+                    {
+                        m_playerCollisionDetector = childrenCollisionDetector;
                         childrenCollisionDetector.OnPlayerCollidedPlatformWithIncorrectColor += OnLose;
+                    }
                 }
 
                 if (m_player.TryGetComponent(out PlayerColorHandler playerColorHandler))
@@ -52,9 +61,9 @@ namespace Game.Level
                     m_playerColorHandler = playerColorHandler;
                 }
 
-                if (m_player.TryGetComponent(out PlayerMovement playerMovement))
+                if (m_player.TryGetComponent(out PlayerInputHandler playerInputHandler))
                 {
-                    m_playerMovement = playerMovement;
+                    m_playerInputHandler = playerInputHandler;
                 }
             }
 
@@ -71,7 +80,7 @@ namespace Game.Level
             foreach (Collectible collectible in collectibles)
             {
                 collectible.OnCollectibleCollected += OnCollectibleCollected;
-                ReactivateCollectibles(m_collectedCollectiblesCache);
+                ReactivateAllCollectibles(m_collectedCollectiblesCache);
             }
         }
 
@@ -80,7 +89,7 @@ namespace Game.Level
             StartLevel();
         }
 
-        private void ReactivateCollectibles(Collectible[] collectibles)
+        private void ReactivateAllCollectibles(Collectible[] collectibles)
         {
             foreach (Collectible collectible in collectibles)
             {
@@ -116,18 +125,28 @@ namespace Game.Level
         
         private void StartLevel()
         {
-            if (Time.timeScale < 1f) StartCoroutine(ChangeTimeScale(Time.timeScale, 1f));
-            ReactivateCollectibles(m_collectedCollectiblesCache);
+            if (Time.timeScale < 1f && m_timeScaleCoroutine != null)
+            {
+                StopCoroutine(m_timeScaleCoroutine);
+            }
+
+            Time.timeScale = 1f;
+            m_playerCollisionDetector.ResetCacheAndCollisions();
+            ReactivateAllCollectibles(m_collectedCollectiblesCache);
             m_playerColorHandler.SetColor(m_initialPlatformColor);
             TeleportPlayerToStart();
-            Time.timeScale = 1f;
+            m_playerInputHandler.EnableAllInputs();
         }
         
         private void OnLose()
         {
             Debug.Log("Lose");
+            OnPlayerJustDied?.Invoke();
+            m_playerInputHandler.DisableAllInputs();
 
-            StartCoroutine(ChangeTimeScale(Time.timeScale, m_loseTimeScale));
+            if (m_timeScaleCoroutine != null) m_timeScaleCoroutine = null;
+            m_timeScaleCoroutine = StartCoroutine(ChangeTimeScale(Time.timeScale, m_loseTimeScale));
+            
             m_transitionManager.FadeOut();
             m_transitionManagerAnimatorSpeaker.OnFadeOutCompleted += OnFadeOutFinished;
         }

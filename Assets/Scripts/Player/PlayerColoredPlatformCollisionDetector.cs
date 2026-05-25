@@ -13,6 +13,7 @@ namespace Game.Player
 
         [SerializeField] private PlayerColorHandler m_playerColorHandler;
         [SerializeField] private LayerMask m_platformLayer;
+        [SerializeField] private Collider m_trigger;
 
         private Dictionary<int, string> m_platformsCache = new();
 
@@ -43,6 +44,13 @@ namespace Game.Player
             {
                 OnCollidedWithPlatformWithIncorrectColor();
             }
+        }
+
+        public void ResetCacheAndCollisions()
+        {
+            m_platformsCache.Clear();
+            m_trigger.enabled = false;
+            m_trigger.enabled = true;
         }
 
         private static bool IsValidColor(PlatformColor currentColor, string platformTag)
