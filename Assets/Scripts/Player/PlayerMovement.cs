@@ -4,7 +4,6 @@ using System.Linq;
 using Game.Player.Data;
 using Game.Utils;
 using Unity.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Game.Player
@@ -16,6 +15,9 @@ namespace Game.Player
             Simple,
             None,
         }
+
+        public event Action OnJumpExecuted;
+        public event Action OnDoubleJumpExecuted;
         
         [SerializeField] private PlayerStats m_stats;
         [SerializeField] private PlayerInputHandler m_inputHandler;
@@ -136,6 +138,15 @@ namespace Game.Player
             
             if (m_jumpsRemaining > 0)
             {
+                if (m_jumpsRemaining == 1)
+                {
+                    OnDoubleJumpExecuted?.Invoke();    
+                }
+                else
+                {
+                    OnJumpExecuted?.Invoke();
+                }
+                
                 float jumpHeight = m_jumpsRemaining == 2 ? m_stats.InitialJumpHeight : m_stats.DoubleJumpHeight;
                 
                 float unityGravity = m_playerBody.useGravity ? Physics.gravity.y : 0f;

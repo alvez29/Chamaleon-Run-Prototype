@@ -10,8 +10,13 @@ namespace Game.Player
         [Header("Components References")]
         [SerializeField] private ShakerComponent m_cameraShake;
         [SerializeField] private LevelManager m_levelManager;
-        [SerializeField] private ParticleSystem m_colorDust;
+        [SerializeField] private ParticleSystem m_colorDustParticles;
+        [SerializeField] private ParticleSystem m_whiteDustParticles;
         [SerializeField] private ParticleSystem m_cubeParticles;
+        [SerializeField] private ParticleSystem m_jumpParticles;
+        [SerializeField] private ParticleSystem m_doubleJumpParticles;
+        [SerializeField] private ParticleSystem m_changeColorParticles;
+        [SerializeField] private TrailRenderer m_windTrail;
         
         [SerializeField] private PlayerGroundDetector m_groundDetector;
         [SerializeField] private PlayerMovement m_playerMovement;
@@ -36,7 +41,14 @@ namespace Game.Player
             m_levelManager.OnPlayerJustDied += () =>
             {
                 PlayCubeParticles(m_playerColorHandler.CurrentColor);
+                m_whiteDustParticles.Play();
                 m_cameraShake.Shake(m_playerDeathCameraShakeIntensity, m_playerDeathCameraShakeDuration);
+                m_windTrail.enabled = false;
+            };
+
+            m_levelManager.OnLevelStarted += () =>
+            {
+                m_windTrail.enabled = true;
             };
 
             if (!m_groundDetector) m_groundDetector = GetComponent<PlayerGroundDetector>();
@@ -47,7 +59,9 @@ namespace Game.Player
             {
                 m_playerColorHandler.OnColorSwitched += newColor =>
                 {
-                    ModifyParticlesColor(m_colorDust, newColor);
+                    ModifyParticlesColor(m_colorDustParticles, newColor);
+                    ModifyParticlesColor(m_changeColorParticles, newColor);
+                    m_changeColorParticles.Play();
                 };
             }
 
@@ -62,19 +76,32 @@ namespace Game.Player
                     
                 };
             }
+            
+            if (m_playerMovement != null)
+            {
+                m_playerMovement.OnJumpExecuted += () =>
+                {
+                    m_jumpParticles.Play();
+                };
+
+                m_playerMovement.OnDoubleJumpExecuted += () =>
+                {
+                    m_doubleJumpParticles.Play();
+                };
+            }
         }
 
         private void FixedUpdate()
         {
             bool shouldEnableColorDustParticles = m_groundDetector.IsGrounded || m_playerMovement.IsJumping;
 
-            if (shouldEnableColorDustParticles && !m_colorDust.isPlaying)
+            if (shouldEnableColorDustParticles && !m_colorDustParticles.isPlaying)
             {
-                m_colorDust.Play();
+                m_colorDustParticles.Play();
             }
-            else if (!shouldEnableColorDustParticles && m_colorDust.isPlaying)
+            else if (!shouldEnableColorDustParticles && m_colorDustParticles.isPlaying)
             {
-                m_colorDust.Stop();
+                m_colorDustParticles.Stop();
             }
         }
 

@@ -11,10 +11,12 @@ namespace Game.Level
     public class LevelManager : MonoBehaviour
     {
         public event Action OnPlayerJustDied;
+        public event Action OnLevelStarted;
         
         [Header("Components References")]
         [SerializeField] private GameObject m_nextLevelPrefab;
         [SerializeField] private GameObject m_player;
+        [SerializeField] private GameObject m_playerVisual;
         [SerializeField] private Transform m_playerStartPoint;
         
         [SerializeField] private PlatformColor m_initialPlatformColor = PlatformColor.Blue;
@@ -131,22 +133,24 @@ namespace Game.Level
             }
 
             Time.timeScale = 1f;
+            m_playerVisual.SetActive(true);
             m_playerCollisionDetector.ResetCacheAndCollisions();
             ReactivateAllCollectibles(m_collectedCollectiblesCache);
             m_playerColorHandler.SetColor(m_initialPlatformColor);
             TeleportPlayerToStart();
             m_playerInputHandler.EnableAllInputs();
+            OnLevelStarted?.Invoke();
         }
         
         private void OnLose()
         {
             Debug.Log("Lose");
             OnPlayerJustDied?.Invoke();
+            m_playerVisual.SetActive(false);
             m_playerInputHandler.DisableAllInputs();
-
+            
             if (m_timeScaleCoroutine != null) m_timeScaleCoroutine = null;
             m_timeScaleCoroutine = StartCoroutine(ChangeTimeScale(Time.timeScale, m_loseTimeScale));
-            
             m_transitionManager.FadeOut();
             m_transitionManagerAnimatorSpeaker.OnFadeOutCompleted += OnFadeOutFinished;
         }

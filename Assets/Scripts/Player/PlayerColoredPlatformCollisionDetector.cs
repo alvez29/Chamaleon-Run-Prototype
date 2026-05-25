@@ -33,7 +33,7 @@ namespace Game.Player
             {
                 return;
             }
-
+            
             PlatformColor currentColor = m_playerColorHandler?.CurrentColor ?? PlatformColor.Black;
 
             if (IsValidColor(currentColor, other.gameObject.tag) && m_playerColorHandler)
