@@ -35,6 +35,16 @@ namespace Game.Player
         {
             UnbindInputActions();
         }
+        
+        public void DisableAllInputs()
+        {
+            m_playerActionMap?.Player.Disable();
+        }
+
+        public void EnableAllInputs()
+        {
+            m_playerActionMap?.Player.Enable();
+        }
 
         private void BindInputActions()
         {

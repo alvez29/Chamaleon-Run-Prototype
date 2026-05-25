@@ -23,12 +23,19 @@ namespace Game.Player
         [SerializeField] private PlayerAnimationUpdater m_animationUpdater;
         [SerializeField] private bool m_autoRun;
         [SerializeField] private BouncePreventionMode m_bouncePreventionMode = BouncePreventionMode.Simple;
-        
+
+        public bool IsFalling => m_playerBody.velocity.y < 0;
+        public bool IsJumping => m_playerBody.velocity.y > 0;
+        public Vector2 Velocity => new Vector2(m_playerBody.velocity.x, m_playerBody.velocity.y); 
+
         private Rigidbody m_playerBody;
         private Collider m_playerBodyCollider;
         private int m_playerBodyColliderId;
         private int m_jumpsRemaining;
         private bool m_isJumpCanceled;
+
+        private float m_targetSpeed;
+        private Coroutine m_speedUpCoroutine;
 
         private void Awake()
         {
@@ -44,6 +51,7 @@ namespace Game.Player
             Physics.ContactModifyEvent += PreventGhostBumpCCD;
 
             m_groundDetector.OnGroundDetected += OnGroundDetectorDetectedGround;
+            m_targetSpeed = m_stats.RunSpeed;
         }
 
 
@@ -75,11 +83,24 @@ namespace Game.Player
             
             if (m_autoRun)
             {
-                ProcessAutoRun(m_playerBody, m_stats.RunSpeed, m_stats.RunAcceleration);
+                ProcessAutoRun(m_playerBody, m_targetSpeed, m_stats.RunAcceleration);
             }
             
             ProcessGravity(m_playerBody);
-            m_animationUpdater.UpdateParameters(m_playerBody.velocity, m_groundDetector.IsGrounded);
+            m_animationUpdater.UpdateParameters(m_playerBody.velocity, m_groundDetector.IsGrounded, m_jumpsRemaining);
+        }
+
+        public void StartSpeedUp(float speedUpTime, float speedFactor)
+        {
+            m_speedUpCoroutine = StartCoroutine(SpeedUpCoroutine(speedUpTime, speedFactor));
+        }
+
+        public void StopSpeedUp()
+        {
+            if (m_speedUpCoroutine != null)
+            {
+                StopCoroutine(m_speedUpCoroutine);    
+            }
         }
         
         private void ProcessGravity(Rigidbody playerBody)
@@ -164,7 +185,7 @@ namespace Game.Player
             }
         }
         
-        private void SimpleBouncePrevention(ModifiableContactPair[] ballContactPairs)
+        private static void SimpleBouncePrevention(ModifiableContactPair[] ballContactPairs)
         {
             foreach (ModifiableContactPair pair in ballContactPairs)
             {
@@ -176,6 +197,23 @@ namespace Game.Player
                     }
                 }
             }
+        }
+        
+        private IEnumerator SpeedUpCoroutine(float speedUpTime, float speedFactor)
+        {
+            float elapsedTime = 0.0f;
+            
+            while (elapsedTime < speedUpTime)
+            {
+                elapsedTime += Time.deltaTime;
+                
+                float alpha = elapsedTime / speedUpTime;
+                m_targetSpeed = m_stats.RunSpeed * Mathf.Lerp(speedFactor, 1, alpha);
+                
+                yield return null;
+            }
+            
+            m_targetSpeed = m_stats.RunSpeed;
         }
     }
 }
