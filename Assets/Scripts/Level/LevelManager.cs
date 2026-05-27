@@ -3,6 +3,7 @@ using System.Collections;
 using System.Linq;
 using Game.Core;
 using Game.Level.Collectibles;
+using Game.Level.Platforms;
 using Game.Manager;
 using Game.Player;
 using UnityEngine;
@@ -27,7 +28,6 @@ namespace Game.Level
         [Header("Settings")]
         [SerializeField] private float m_loseTimeScale = 0.2f;
 
-        private Collectible[] m_collectedCollectiblesCache = Array.Empty<Collectible>();
         private Coroutine m_timeScaleCoroutine;
         private bool m_hasLost;
         
@@ -35,6 +35,9 @@ namespace Game.Level
         private PlayerMovement m_playerMovement;
         private PlayerColorHandler m_playerColorHandler;
         private PlayerColoredPlatformCollisionDetector m_playerCollisionDetector;
+
+        private int m_currentPoints;
+        private int m_maxPoints;
         
         private void Awake()
         {
@@ -42,8 +45,9 @@ namespace Game.Level
             m_transitionManager.FadeIn();
             
             KillZoneBehaviour[] killZones = FindObjectsOfType<KillZoneBehaviour>();
-            WinCollectible[] winCollectibles= FindObjectsOfType<WinCollectible>();
             Collectible[] collectibles = FindObjectsOfType<Collectible>();
+            MovingPlatformComponent[] movingPlatforms = FindObjectsOfType<MovingPlatformComponent>();
+            
 
             if (m_nextLevel != null && m_sceneManager != null)
             {
@@ -89,16 +93,25 @@ namespace Game.Level
             {
                 killzone.OnPlayerEnteredKillZone += OnLose;
             }
-
-            foreach (WinCollectible winCollectible in winCollectibles)
-            {
-                winCollectible.OnWinCollectibleCollected += OnWin;
-            }
-
+            
             foreach (Collectible collectible in collectibles)
             {
-                collectible.OnCollectibleCollected += OnCollectibleCollected;
-                ReactivateAllCollectibles(m_collectedCollectiblesCache);
+                OnLevelStarted += collectible.Activate;
+
+                switch (collectible)
+                {
+                    case WinCollectible:
+                        collectible.OnCollectibleCollected += OnWin;
+                        break;
+                    case PointCollectible:
+                        collectible.OnCollectibleCollected += OnPointCollected;
+                        break;
+                }
+            }
+            
+            foreach (MovingPlatformComponent movingPlatformComponent in movingPlatforms)
+            {
+                OnLevelStarted += movingPlatformComponent.ResetPosition;
             }
         }
 
@@ -107,21 +120,6 @@ namespace Game.Level
             StartLevel();
         }
 
-        private void ReactivateAllCollectibles(Collectible[] collectibles)
-        {
-            foreach (Collectible collectible in collectibles)
-            {
-                collectible.Activate();
-            }
-
-            m_collectedCollectiblesCache = Array.Empty<Collectible>();
-        }
-
-        private void OnCollectibleCollected(Collectible collectible)
-        {
-            m_collectedCollectiblesCache = m_collectedCollectiblesCache.Append(collectible).ToArray();
-        }
-        
         private void TeleportPlayerToStart()
         {
             if (m_player == null || m_playerStartPoint == null) return;
@@ -149,10 +147,10 @@ namespace Game.Level
             }
 
             Time.timeScale = 1f;
+            m_currentPoints = 0;
             m_playerMovement.EnableAutoRun();
             m_playerVisual.SetActive(true);
             m_playerCollisionDetector.ResetCacheAndCollisions();
-            ReactivateAllCollectibles(m_collectedCollectiblesCache);
             m_playerColorHandler.SetColor(m_initialPlatformColor);
             TeleportPlayerToStart();
             m_playerInputHandler.EnableAllInputs();
@@ -164,6 +162,7 @@ namespace Game.Level
         {
             Debug.Log("[Level Manager] Lose");
             m_hasLost = true;
+            m_currentPoints = 0;
             OnPlayerJustDied?.Invoke();
             m_playerVisual.SetActive(false);
             m_playerInputHandler.DisableAllInputs();
@@ -198,6 +197,11 @@ namespace Game.Level
                 m_transitionManager.PlayFinishLevelTransition();
                 m_transitionManager.OnFinishLevelTransitionFinished += OnFinishLevelTransitionFinished;    
             }
+        }
+
+        private void OnPointCollected()
+        {
+            m_currentPoints++;
         }
 
         private void OnFinishLevelTransitionFinished()

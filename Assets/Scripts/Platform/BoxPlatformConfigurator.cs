@@ -22,14 +22,7 @@ namespace Game.Level
         [HideInInspector]
         [SerializeField] private List<PlatformData> m_cachedBlocks = new();
         
-        
-        
-        private Vector3Int m_size => new Vector3Int(m_length, m_height, m_depth);
-        
-        private void Awake()
-        {
-            Configure();
-        }
+        private Vector3Int m_size => new(m_length, m_height, m_depth);
 
         private bool m_isConfigureScheduled = false;
 
