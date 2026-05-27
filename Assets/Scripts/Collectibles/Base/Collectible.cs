@@ -6,7 +6,7 @@ namespace Game.Level
 {
     public abstract class Collectible : MonoBehaviour
     {
-        public event Action<Collectible> OnCollectibleCollected;
+        public event Action OnCollectibleCollected;
 
         private const int PLAYER_LAYER = 3;
         
@@ -25,7 +25,7 @@ namespace Game.Level
             {
                 OnCollected(other.gameObject);
                 onCollectedParticles.Play();
-                OnCollectibleCollected?.Invoke(this);
+                OnCollectibleCollected?.Invoke();
                 Deactivate();
             }
             
@@ -33,7 +33,7 @@ namespace Game.Level
 
         protected abstract void OnCollected(GameObject player);
 
-        protected internal void Deactivate()
+        protected internal virtual void Deactivate()
         {
             m_isActivated = false;
         }

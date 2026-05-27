@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using Game.Player;
-using Game.Player.Data;
+﻿using Game.Player;
 using UnityEngine;
 
 namespace Game.Level.Collectibles
@@ -10,6 +8,7 @@ namespace Game.Level.Collectibles
         [SerializeField] private float m_horizontalForceStrength = 3000;
         [SerializeField] private float m_speedUpTime = 2f;
         [SerializeField] private float m_speedFactor = 1.5f;
+        [SerializeField] private ParticleSystem m_impulseParticles;
 
         private PlayerMovement m_playerMovement;
         
@@ -28,12 +27,22 @@ namespace Game.Level.Collectibles
 
         protected internal override void Activate()
         {
+            base.Activate();
+            
             if (m_playerMovement)
             {
                 m_playerMovement.StopSpeedUp();
                 m_playerMovement = null;    
             }
-            base.Activate();
+            
+            m_impulseParticles.Play();
+        }
+
+        protected internal override void Deactivate()
+        {
+            m_impulseParticles.Stop();
+            
+            base.Deactivate();
         }
     }
 }
