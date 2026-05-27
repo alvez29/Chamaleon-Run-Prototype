@@ -31,15 +31,24 @@ namespace Game.Level
             Configure();
         }
 
+        private bool m_isConfigureScheduled = false;
+
 #if UNITY_EDITOR
         private void OnValidate()
         {
             if (Application.isPlaying) return;
+            if (EditorApplication.isPlayingOrWillChangePlaymode) return;
             if (PrefabUtility.IsPartOfPrefabAsset(this)) return;
+            
+            if (m_isConfigureScheduled) return;
+            m_isConfigureScheduled = true;
             
             EditorApplication.delayCall += () =>
             {
-                if (this == null) return;
+                m_isConfigureScheduled = false;
+                if (this == null || gameObject == null) return;
+                if (EditorApplication.isPlayingOrWillChangePlaymode) return;
+                
                 UpdateCachedBlocks();
                 Configure();
             };
@@ -169,7 +178,7 @@ namespace Game.Level
         {
             if (m_useMeshCollider)
             {
-                Debug.LogWarning("MeshCollider no está soportado en plataformas dinámicas compuestas.");
+                Debug.LogWarning("[BoxPlatformConfigurator] MeshCollider is not compatible with this configuration");
             }
 
             if (TryGetComponent(out MeshCollider meshCol))

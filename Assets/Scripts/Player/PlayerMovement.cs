@@ -29,6 +29,7 @@ namespace Game.Player
         public bool IsFalling => m_playerBody.velocity.y < 0;
         public bool IsJumping => m_playerBody.velocity.y > 0;
         public Vector2 Velocity => new Vector2(m_playerBody.velocity.x, m_playerBody.velocity.y); 
+        public int JumpsRemaining => m_jumpsRemaining; 
 
         private Rigidbody m_playerBody;
         private Collider m_playerBodyCollider;
@@ -91,7 +92,18 @@ namespace Game.Player
             ProcessGravity(m_playerBody);
             m_animationUpdater.UpdateParameters(m_playerBody.velocity, m_groundDetector.IsGrounded, m_jumpsRemaining);
         }
+        
+        public void StopAutoRun()
+        {
+            m_playerBody.velocity = Vector3.zero;
+            m_autoRun = false;
+        }
 
+        public void EnableAutoRun()
+        {
+            m_autoRun = true;
+        }
+        
         public void StartSpeedUp(float speedUpTime, float speedFactor)
         {
             m_speedUpCoroutine = StartCoroutine(SpeedUpCoroutine(speedUpTime, speedFactor));
@@ -173,9 +185,11 @@ namespace Game.Player
 
         private void ProcessAutoRun(Rigidbody playerBody, float runSpeed, float runAcceleration)
         {
-            float speedDifference = runSpeed - playerBody.velocity.x;
-            
-            m_playerBody.AddForce(Vector3.right * (speedDifference * runAcceleration), ForceMode.Acceleration);
+            var currentForwardSpeed = playerBody.velocity.x;
+            float speedDifference = runSpeed - currentForwardSpeed;
+    
+            currentForwardSpeed += (speedDifference * runAcceleration) * Time.fixedDeltaTime;
+            playerBody.velocity = new Vector3(currentForwardSpeed, playerBody.velocity.y, playerBody.velocity.z);
         }
         
         private void PreventGhostBumpCCD(PhysicsScene physicsScene, NativeArray<ModifiableContactPair> contactPairs)
