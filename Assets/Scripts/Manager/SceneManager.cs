@@ -34,7 +34,9 @@ namespace Game.Manager
 
         private IEnumerator LoadSceneRoutine(string sceneName, bool activateImmediately)
         {
-            yield return null; 
+            yield return null;
+
+            if (string.IsNullOrEmpty(sceneName)) yield break;
             
             m_currentLoadOperation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName);
 
