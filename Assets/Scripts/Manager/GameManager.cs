@@ -1,4 +1,5 @@
-﻿using Game.Level;
+using System;
+using Game.Level;
 using UnityEngine;
 
 namespace Game.Manager
@@ -23,5 +24,23 @@ namespace Game.Manager
         
         [SerializeField] private GameObject m_player;
         [SerializeField] private LevelManager m_currentLevel;
+        
+        [SerializeField] private int m_targetFps = 60;
+
+        private void Awake()
+        {
+            if (m_instance != null && m_instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            
+            m_instance = this;
+            transform.SetParent(null);
+            DontDestroyOnLoad(gameObject);
+            
+            Application.targetFrameRate = m_targetFps;
+            QualitySettings.vSyncCount = 0;
+        }
     }
 }

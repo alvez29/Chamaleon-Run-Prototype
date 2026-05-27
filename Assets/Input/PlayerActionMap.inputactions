@@ -39,11 +39,33 @@
                 },
                 {
                     "name": "",
+                    "id": "b9c58b90-868c-4544-a675-d22bac44440e",
+                    "path": "<Touchscreen>/Press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Mobile",
+                    "action": "SwitchColor",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "73042e2c-7ae9-48c9-977f-ae975762e740",
                     "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
                     "groups": ";PC",
+                    "action": "Jump",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "10fffc28-bc5a-4bfa-861b-7a79a211a362",
+                    "path": "<Touchscreen>/Press",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": ";Mobile",
                     "action": "Jump",
                     "isComposite": false,
                     "isPartOfComposite": false
