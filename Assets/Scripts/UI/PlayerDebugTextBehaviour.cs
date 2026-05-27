@@ -25,7 +25,8 @@ namespace Game.UI
                                $"<b>Current Color:</b> {m_playerColorHandler.CurrentColor}\n" +
                                $"<b>Is Jumping:</b> {m_playerMovement.IsJumping}\n" +
                                $"<b>Is Falling:</b> {m_playerMovement.IsFalling}\n" +
-                               $"<b>Jumps Remaining:</b> {m_playerMovement.JumpsRemaining}\n";
+                               $"<b>Jumps Remaining:</b> {m_playerMovement.JumpsRemaining}\n" +
+                               $"FPS {1/Time.deltaTime}\n";
 
             m_debugText.text = debugInfo;
         }
