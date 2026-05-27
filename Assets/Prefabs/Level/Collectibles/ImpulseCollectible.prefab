@@ -125,6 +125,11 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 5444425514692346867}
   m_SourcePrefab: {fileID: 100100000, guid: cfd86de99b879744d80e1f6b9477a935, type: 3}
+--- !u!198 &2585614107873028666 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 2098392192316662215, guid: cfd86de99b879744d80e1f6b9477a935, type: 3}
+  m_PrefabInstance: {fileID: 4539363168224168957}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &3794791890262625181 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 744995949412958304, guid: cfd86de99b879744d80e1f6b9477a935, type: 3}
@@ -147,7 +152,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b93c770df67a4ce1858684c1a6dd5ae3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_playerLayer:
-    serializedVersion: 2
-    m_Bits: 8
+  onCollectedParticles: {fileID: 2585614107873028666}
   m_horizontalForceStrength: 3000
+  m_speedUpTime: 2
+  m_speedFactor: 1.5
