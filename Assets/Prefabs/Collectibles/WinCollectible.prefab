@@ -4891,14 +4891,14 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 7632851503799027264, guid: cfd86de99b879744d80e1f6b9477a935, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2667749341870178080}
+      addedObject: {fileID: 1668308375737634575}
   m_SourcePrefab: {fileID: 100100000, guid: cfd86de99b879744d80e1f6b9477a935, type: 3}
 --- !u!1 &1652601577862980255 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7632851503799027264, guid: cfd86de99b879744d80e1f6b9477a935, type: 3}
   m_PrefabInstance: {fileID: 9151998758227715295}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2667749341870178080
+--- !u!114 &1668308375737634575
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -4907,11 +4907,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 1652601577862980255}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8d867a2cfaa491087540fa4cd862650, type: 3}
+  m_Script: {fileID: 11500000, guid: bcabb176e899495fbbfca85f80f6d5f2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   onCollectedParticles: {fileID: 7069687097615336728}
-  winCollectibleParticles: {fileID: 8786225463347708258}
 --- !u!198 &7069687097615336728 stripped
 ParticleSystem:
   m_CorrespondingSourceObject: {fileID: 2098392192316662215, guid: cfd86de99b879744d80e1f6b9477a935, type: 3}
