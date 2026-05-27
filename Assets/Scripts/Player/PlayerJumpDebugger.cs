@@ -8,10 +8,8 @@ namespace Game.Player
         [SerializeField] private PlayerStats m_stats;
         
         [Header("Simulation Settings")]
-        [Tooltip("Activa esto para simular un doble salto en ambas trayectorias")]
         [SerializeField] private bool m_simulateDoubleJump;
         
-        [Tooltip("En qué segundo del salto se pulsa el doble salto")]
         [Range(0f, 1f)]
         [SerializeField] private float m_doubleJumpTime = 0.35f;
 
@@ -19,10 +17,7 @@ namespace Game.Player
         {
             if (m_stats == null) return;
 
-            // 1. Salto Corto (suelta el botón nada más saltar, usa FallGravityFactor mientras sube)
             DrawTrajectory(simulateShortJump: true, colorUp: Color.yellow);
-
-            // 2. Salto Largo (deja pulsado el botón hasta arriba, usa JumpGravityFactor mientras sube)
             DrawTrajectory(simulateShortJump: false, colorUp: Color.green);
         }
 
@@ -31,11 +26,9 @@ namespace Game.Player
             Vector3 currentPos = transform.position;
             float currentVx = m_stats.RunSpeed;
             
-            // Comprobamos si el jugador tiene Use Gravity activado en el Rigidbody
             Rigidbody rb = GetComponent<Rigidbody>();
-            float unityGravity = (rb != null && rb.useGravity) ? Physics.gravity.y : 0f;
+            float unityGravity = rb is {useGravity: true} ? Physics.gravity.y : 0f;
             
-            // Gravedades efectivas
             float effectiveUpGravity = unityGravity - (m_stats.BaseGravity * m_stats.JumpGravityFactor);
             float effectiveDownGravity = unityGravity - (m_stats.BaseGravity * m_stats.FallGravityFactor);
             
@@ -58,27 +51,24 @@ namespace Game.Player
                     Gizmos.DrawWireSphere(currentPos, 0.2f);
                 }
 
-                // Lógica de gravedad de tu ProcessGravity
                 float currentEffectiveGravity;
                 
-                if (currentVy < 0) // isFalling
+                if (currentVy < 0)
                 {
                     currentEffectiveGravity = effectiveDownGravity;
                     Gizmos.color = Color.red;
                 }
-                else // isJumping
+                else
                 {
                     if (simulateShortJump && !doubleJumpTriggered)
                     {
-                        // Si soltamos el botón (m_isJumpCanceled o !IsJumpPressed), usamos la gravedad de caída
                         currentEffectiveGravity = effectiveDownGravity;
-                        Gizmos.color = colorUp; // Amarillo
+                        Gizmos.color = colorUp;
                     }
                     else
                     {
-                        // Si dejamos pulsado, usamos la gravedad de salto
                         currentEffectiveGravity = effectiveUpGravity;
-                        Gizmos.color = colorUp; // Verde
+                        Gizmos.color = colorUp;
                     }
                 }
                 
