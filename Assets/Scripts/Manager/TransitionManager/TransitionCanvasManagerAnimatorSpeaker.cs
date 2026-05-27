@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Game.Manager.TransitionManager
 {
-    public class TransitionManagerAnimatorSpeaker : MonoBehaviour
+    public class TransitionCanvasAnimatorSpeaker : MonoBehaviour
     {
         public event System.Action OnFadeOutCompleted;
         public event System.Action OnFadeInCompleted;

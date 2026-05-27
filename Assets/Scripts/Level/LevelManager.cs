@@ -1,8 +1,9 @@
 using System;
 using System.Collections;
 using System.Linq;
+using Game.Core;
 using Game.Level.Collectibles;
-using Game.Manager.TransitionManager;
+using Game.Manager;
 using Game.Player;
 using UnityEngine;
 
@@ -14,31 +15,41 @@ namespace Game.Level
         public event Action OnLevelStarted;
         
         [Header("Components References")]
-        [SerializeField] private GameObject m_nextLevelPrefab;
+        [SerializeField] private SceneReference m_nextLevel;
         [SerializeField] private GameObject m_player;
         [SerializeField] private GameObject m_playerVisual;
         [SerializeField] private Transform m_playerStartPoint;
+        [SerializeField] private SceneManager m_sceneManager;
         
         [SerializeField] private PlatformColor m_initialPlatformColor = PlatformColor.Blue;
         [SerializeField] private TransitionManager m_transitionManager;
-        [SerializeField] private TransitionManagerAnimatorSpeaker m_transitionManagerAnimatorSpeaker;
         
         [Header("Settings")]
         [SerializeField] private float m_loseTimeScale = 0.2f;
 
         private Collectible[] m_collectedCollectiblesCache = Array.Empty<Collectible>();
         private Coroutine m_timeScaleCoroutine;
+        private bool m_hasLost;
         
         private PlayerInputHandler m_playerInputHandler;
+        private PlayerMovement m_playerMovement;
         private PlayerColorHandler m_playerColorHandler;
         private PlayerColoredPlatformCollisionDetector m_playerCollisionDetector;
         
         private void Awake()
         {
+            m_transitionManager.FadeOutInmmediatly();
+            m_transitionManager.FadeIn();
+            
             KillZoneBehaviour[] killZones = FindObjectsOfType<KillZoneBehaviour>();
             WinCollectible[] winCollectibles= FindObjectsOfType<WinCollectible>();
             Collectible[] collectibles = FindObjectsOfType<Collectible>();
 
+            if (m_nextLevel != null && m_sceneManager != null)
+            {
+                m_sceneManager.PreloadScene(m_nextLevel);
+            }
+            
             if (m_player != null)
             {
                 if (m_player.TryGetComponent(out PlayerColoredPlatformCollisionDetector collisionDetector))
@@ -66,6 +77,11 @@ namespace Game.Level
                 if (m_player.TryGetComponent(out PlayerInputHandler playerInputHandler))
                 {
                     m_playerInputHandler = playerInputHandler;
+                }
+                
+                if (m_player.TryGetComponent(out PlayerMovement playerMovement))
+                {
+                    m_playerMovement = playerMovement;
                 }
             }
 
@@ -118,10 +134,10 @@ namespace Game.Level
             }
         }
 
-        private void OnFadeOutFinished()
+        private void OnResetLevelTransitionFinished()
         {
             m_transitionManager.FadeIn();
-            m_transitionManagerAnimatorSpeaker.OnFadeOutCompleted -= OnFadeOutFinished;
+            m_transitionManager.OnResetLevelTransitionFinished -= OnResetLevelTransitionFinished;
             StartLevel();
         }
         
@@ -133,26 +149,30 @@ namespace Game.Level
             }
 
             Time.timeScale = 1f;
+            m_playerMovement.EnableAutoRun();
             m_playerVisual.SetActive(true);
             m_playerCollisionDetector.ResetCacheAndCollisions();
             ReactivateAllCollectibles(m_collectedCollectiblesCache);
             m_playerColorHandler.SetColor(m_initialPlatformColor);
             TeleportPlayerToStart();
             m_playerInputHandler.EnableAllInputs();
+            m_hasLost = false;
             OnLevelStarted?.Invoke();
         }
         
         private void OnLose()
         {
-            Debug.Log("Lose");
+            Debug.Log("[Level Manager] Lose");
+            m_hasLost = true;
             OnPlayerJustDied?.Invoke();
             m_playerVisual.SetActive(false);
             m_playerInputHandler.DisableAllInputs();
             
             if (m_timeScaleCoroutine != null) m_timeScaleCoroutine = null;
+            
             m_timeScaleCoroutine = StartCoroutine(ChangeTimeScale(Time.timeScale, m_loseTimeScale));
-            m_transitionManager.FadeOut();
-            m_transitionManagerAnimatorSpeaker.OnFadeOutCompleted += OnFadeOutFinished;
+            m_transitionManager.PlayResetLevelTransition();
+            m_transitionManager.OnResetLevelTransitionFinished += OnResetLevelTransitionFinished;
         }
 
         IEnumerator ChangeTimeScale(float originTimeScale, float targetTimeScale, float transitionDuration = 0.2f)
@@ -171,7 +191,30 @@ namespace Game.Level
 
         private void OnWin()
         {
-            Debug.Log("Win");
+            if (!m_hasLost)
+            {
+                m_playerInputHandler.DisableAllInputs();
+                m_playerMovement.StopAutoRun();
+                m_transitionManager.PlayFinishLevelTransition();
+                m_transitionManager.OnFinishLevelTransitionFinished += OnFinishLevelTransitionFinished;    
+            }
+        }
+
+        private void OnFinishLevelTransitionFinished()
+        {
+            Debug.Log("[Level Manager] Win");
+            
+            if (m_sceneManager!= null && !m_sceneManager.ActivatePreloadedScene())
+            {
+                if (m_nextLevel != null)
+                {
+                    m_sceneManager.LoadScene(m_nextLevel);
+                }
+                else
+                {
+                    Debug.Log("[Level Manager] Level could not be loaded");
+                }
+            }
         }
     }
 }

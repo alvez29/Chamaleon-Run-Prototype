@@ -1,5 +1,4 @@
-﻿using System;
-using Game.Level;
+﻿using Game.Level;
 using UnityEngine;
 
 namespace Game.Manager

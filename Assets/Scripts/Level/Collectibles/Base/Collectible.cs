@@ -10,13 +10,12 @@ namespace Game.Level
 
         private const int PLAYER_LAYER = 3;
         
-        private MeshRenderer m_meshRenderer;
+        [SerializeField] private ParticleSystem onCollectedParticles; 
+        
         private bool m_isActivated = true;
 
         private void Awake()
         {
-            m_meshRenderer = GetComponentInChildren<MeshRenderer>();
-
             Activate();
         }
 
@@ -25,6 +24,7 @@ namespace Game.Level
             if (m_isActivated && ((1 << other.gameObject.layer) & PLAYER_LAYER) == 0)
             {
                 OnCollected(other.gameObject);
+                onCollectedParticles.Play();
                 OnCollectibleCollected?.Invoke(this);
                 Deactivate();
             }
@@ -33,16 +33,14 @@ namespace Game.Level
 
         protected abstract void OnCollected(GameObject player);
 
-        protected internal virtual void Deactivate()
+        protected internal void Deactivate()
         {
             m_isActivated = false;
-            m_meshRenderer.enabled = false;
         }
 
         protected internal virtual void Activate()
         {
             m_isActivated = true;
-            m_meshRenderer.enabled = true;
         }
     }
 }
