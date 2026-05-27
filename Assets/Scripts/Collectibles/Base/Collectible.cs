@@ -2,7 +2,7 @@
 using Game.Utils;
 using UnityEngine;
 
-namespace Game.Level
+namespace Game.Level.Collectibles
 {
     public abstract class Collectible : MonoBehaviour
     {

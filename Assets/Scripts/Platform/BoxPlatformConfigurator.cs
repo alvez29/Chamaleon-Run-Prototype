@@ -17,14 +17,14 @@ namespace Game.Level
         [SerializeField] [Range(0, 1000)] private int m_length = 6;
         [SerializeField] [Range(0, 1000)] private int m_height = 2;
         [SerializeField] [Range(0, 1000)] private int m_depth = 2;
-        [SerializeField] private PlatformData.PlatformType m_platformTypeUsed = PlatformData.PlatformType.Squared;
+        [SerializeField] private PlatformData.PlatformType m_platformTypeUsed;
         
         [HideInInspector]
         [SerializeField] private List<PlatformData> m_cachedBlocks = new();
         
         private Vector3Int m_size => new(m_length, m_height, m_depth);
 
-        private bool m_isConfigureScheduled = false;
+        private bool m_isConfigureScheduled;
 
 #if UNITY_EDITOR
         private void OnValidate()
