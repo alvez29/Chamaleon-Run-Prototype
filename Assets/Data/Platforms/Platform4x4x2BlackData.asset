@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79adadaa02d54fc6a6f4b81ea74aebdd, type: 3}
   m_Name: Platform4x4x2BlackData
   m_EditorClassIdentifier: 
-  Color: 2
-  PlatformPrefab: {fileID: 919132149155446097, guid: 2f3d55c57b318794f9f5b9e584405e35, type: 3}
-  Dimensions: {x: 4, y: 2, z: 4}
-  UseMeshCollider: 0
-  Type: 0
+  m_color: 2
+  m_platformPrefab: {fileID: 919132149155446097, guid: 2f3d55c57b318794f9f5b9e584405e35, type: 3}
+  m_dimensions: {x: 4, y: 2, z: 4}
+  m_useMeshCollider: 0
+  m_type: 0

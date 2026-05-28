@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 79adadaa02d54fc6a6f4b81ea74aebdd, type: 3}
   m_Name: PlatformHole6x6x1BlueData
   m_EditorClassIdentifier: 
-  Color: 0
-  PlatformPrefab: {fileID: 919132149155446097, guid: 4d4cb04005c21ae45b2c0a6624e38dca, type: 3}
-  Dimensions: {x: 6, y: 1, z: 6}
-  UseMeshCollider: 0
-  Type: 3
+  m_color: 0
+  m_platformPrefab: {fileID: 919132149155446097, guid: 4d4cb04005c21ae45b2c0a6624e38dca, type: 3}
+  m_dimensions: {x: 6, y: 1, z: 6}
+  m_useMeshCollider: 0
+  m_type: 3
