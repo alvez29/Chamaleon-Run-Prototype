@@ -41,35 +41,34 @@ namespace Game.Editor
                 
                 string assetPath = AssetDatabase.GUIDToAssetPath(guid);
                 string fileName = Path.GetFileNameWithoutExtension(assetPath).ToLower();
+                
+                bool shouldProcess = fileName.StartsWith("barrier") || fileName.StartsWith("platform");
+                if (!shouldProcess) continue;
+                
                 Vector3Int dimensions = GetDimensionsFromFileName(fileName);
 
                 GameObject modelPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
                 if (modelPrefab == null) continue;
-
-                bool shouldProcess = fileName.StartsWith("barrier") || fileName.StartsWith("platform");
                 
-                if (shouldProcess)
-                {
-                    bool isSlope = fileName.Contains("slope");
-                    bool isBarrier = fileName.Contains("barrier");
-                    bool isSquaredPlatform = System.Text.RegularExpressions.Regex
-                        .Match(fileName, @"^platform_\d+").Success;
-                    PlatformData.PlatformType platformType =
-                        GetPlatformType(serializedObject, isBarrier, isSlope, isSquaredPlatform);
+                bool isSlope = fileName.Contains("slope");
+                bool isBarrier = fileName.Contains("barrier");
+                bool isSquaredPlatform = System.Text.RegularExpressions.Regex
+                    .Match(fileName, @"^platform_\d+").Success;
+                PlatformData.PlatformType platformType =
+                    GetPlatformType(serializedObject, isBarrier, isSlope, isSquaredPlatform);
                     
-                    serializedObject.FindProperty("Color").enumValueIndex = (int)color;
-                    serializedObject.FindProperty("PlatformPrefab").objectReferenceValue = modelPrefab;
-                    serializedObject.FindProperty("UseMeshCollider").boolValue = isSlope;
-                    serializedObject.FindProperty("Dimensions").vector3IntValue = dimensions;
-                    serializedObject.FindProperty("Type").enumValueIndex = (int)platformType;
+                serializedObject.FindProperty("m_color").enumValueIndex = (int)color;
+                serializedObject.FindProperty("m_platformPrefab").objectReferenceValue = modelPrefab;
+                serializedObject.FindProperty("m_useMeshCollider").boolValue = isSlope;
+                serializedObject.FindProperty("m_dimensions").vector3IntValue = dimensions;
+                serializedObject.FindProperty("m_type").enumValueIndex = (int)platformType;
                     
-                    serializedObject.ApplyModifiedProperties();
+                serializedObject.ApplyModifiedProperties();
 
-                    string pascalName = ToPascalCase(fileName);
-                    string finalPath = $"{outputFolder}/{pascalName}Data.asset";
-
-                    AssetDatabase.CreateAsset(newData, finalPath);
-                }
+                string pascalName = ToPascalCase(fileName);
+                string finalPath = $"{outputFolder}/{pascalName}Data.asset";
+    
+                AssetDatabase.CreateAsset(newData, finalPath);
             }
 
             PlatformData.PlatformType GetPlatformType(SerializedObject serializedObject, bool isBarrier, bool isSlope, bool isSquaredPlatform)

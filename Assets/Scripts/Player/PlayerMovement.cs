@@ -28,7 +28,7 @@ namespace Game.Player
 
         public bool IsFalling => m_playerBody.velocity.y < 0;
         public bool IsJumping => m_playerBody.velocity.y > 0;
-        public Vector2 Velocity => new Vector2(m_playerBody.velocity.x, m_playerBody.velocity.y); 
+        public Vector2 Velocity => new(m_playerBody.velocity.x, m_playerBody.velocity.y); 
         public int JumpsRemaining => m_jumpsRemaining; 
 
         private Rigidbody m_playerBody;
@@ -39,6 +39,7 @@ namespace Game.Player
 
         private float m_targetSpeed;
         private Coroutine m_speedUpCoroutine;
+        private Vector3 m_frameVelocity;
 
         private void Awake()
         {
@@ -159,7 +160,7 @@ namespace Game.Player
                     OnJumpExecuted?.Invoke();
                 }
                 
-                float jumpHeight = m_jumpsRemaining == 2 ? m_stats.InitialJumpHeight : m_stats.DoubleJumpHeight;
+                float jumpHeight = m_jumpsRemaining == Constants.MAX_PLAYER_JUMPS ? m_stats.InitialJumpHeight : m_stats.DoubleJumpHeight;
                 
                 float unityGravity = m_playerBody.useGravity ? Physics.gravity.y : 0f;
                 float effectiveUpGravity = unityGravity - (m_stats.BaseGravity * m_stats.JumpGravityFactor);

@@ -48,7 +48,10 @@ namespace Game.Manager
                 {
                     OnScenePreloaded?.Invoke();
 
-                    yield return new WaitUntil(() => m_currentLoadOperation.allowSceneActivation);
+                    while (!m_currentLoadOperation.allowSceneActivation)
+                    {
+                        yield return null;
+                    }
                 }
 
                 while (!m_currentLoadOperation.isDone)

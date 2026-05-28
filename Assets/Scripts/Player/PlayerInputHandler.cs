@@ -35,6 +35,18 @@ namespace Game.Player
         {
             UnbindInputActions();
         }
+
+        public void EmulateJumpPressed()
+        {
+            InputAction.CallbackContext context = new InputAction.CallbackContext();
+            HandleJumpStarted(context);
+        }
+        
+        public void EmulateSwitchColorPressed()
+        {
+            InputAction.CallbackContext context = new InputAction.CallbackContext();
+            HandleSwitchColorStarted(context);
+        }
         
         public void DisableAllInputs()
         {
