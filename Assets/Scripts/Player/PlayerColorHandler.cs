@@ -6,7 +6,7 @@ namespace Game.Player
 {
     public class PlayerColorHandler : MonoBehaviour
     {
-        public event Action<PlatformColor> OnColorSwitched; 
+        public event Action<PlatformColor, bool> OnColorSwitched; 
         
         [SerializeField] private PlayerInputHandler m_playerInputHandler;
         [SerializeField] private Renderer[] m_visuals;
@@ -41,6 +41,12 @@ namespace Game.Player
             m_isYellow = color == PlatformColor.Yellow;
             UpdateMaterial(m_visuals, CurrentColor);
         }
+
+        public void SetInitialColor(PlatformColor color)
+        {
+            m_isYellow = color == PlatformColor.Yellow;
+            UpdateMaterial(m_visuals, CurrentColor, false);
+        }
         
         private void SwitchColor()
         {
@@ -48,7 +54,7 @@ namespace Game.Player
             UpdateMaterial(m_visuals, CurrentColor);
         }
         
-        private void UpdateMaterial(Renderer[] visuals, PlatformColor color)
+        private void UpdateMaterial(Renderer[] visuals, PlatformColor color, bool shouldPlaySound = true)
         {
             Material materialToApply = color == PlatformColor.Yellow ? m_yellowMaterial : m_blueMaterial;
             
@@ -57,7 +63,7 @@ namespace Game.Player
                 model.material = materialToApply;
             } 
             
-            OnColorSwitched?.Invoke(color);
+            OnColorSwitched?.Invoke(color, shouldPlaySound);
         }
         
     }

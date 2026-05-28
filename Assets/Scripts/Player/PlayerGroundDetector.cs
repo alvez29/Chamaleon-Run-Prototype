@@ -7,6 +7,7 @@ namespace Game.Player
     public class PlayerGroundDetector : MonoBehaviour
     {
         public event Action OnGroundDetected;
+        public event Action OnGroundLost;
         
         [SerializeField] private PlayerStats m_stats;
 
@@ -25,6 +26,8 @@ namespace Game.Player
             
             if (lastGroundedState != IsGrounded && IsGrounded)
                 OnGroundDetected?.Invoke();
+            else if (lastGroundedState != IsGrounded && !IsGrounded)
+                OnGroundLost?.Invoke();
         }
 
         private void OnDrawGizmos()

@@ -66,7 +66,7 @@ namespace Game.Player
             }
         }
 
-        private void OnPlayerChangedColor(PlatformColor currentColor)
+        private void OnPlayerChangedColor(PlatformColor currentColor, bool shouldPlaySound)
         {
             if (m_platformsCache.Any(pair => !IsValidColor(currentColor, pair.Value)))
             {

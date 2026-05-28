@@ -1,11 +1,11 @@
 using System;
 using System.Collections;
-using System.Linq;
 using Game.Core;
 using Game.Level.Collectibles;
 using Game.Level.Platforms;
 using Game.Manager;
 using Game.Player;
+using Game.UI;
 using UnityEngine;
 
 namespace Game.Level
@@ -14,6 +14,7 @@ namespace Game.Level
     {
         public event Action OnPlayerJustDied;
         public event Action OnLevelStarted;
+        public event Action OnLevelWon;
         
         [Header("Components References")]
         [SerializeField] private SceneReference m_nextLevel;
@@ -24,7 +25,10 @@ namespace Game.Level
         
         [SerializeField] private PlatformColor m_initialPlatformColor = PlatformColor.Blue;
         [SerializeField] private TransitionManager m_transitionManager;
+        
         [SerializeField] private GameObject m_touchingCanvas;
+        [SerializeField] private GameObject m_victoryScreenPrefab;
+        [SerializeField] private GameObject m_mainUICanvas;
         
         [Header("Settings")]
         [SerializeField] private float m_loseTimeScale = 0.2f;
@@ -39,6 +43,7 @@ namespace Game.Level
 
         private int m_currentPoints;
         private int m_maxPoints;
+        private bool m_hasLevelStarted;
         
         private void Awake()
         {
@@ -71,6 +76,8 @@ namespace Game.Level
 
         private void BindPlayerEventsAndInitializeVariables()
         {
+            m_hasLevelStarted = false;
+            
             if (m_player == null) return;
             
             if (m_player.TryGetComponent(out PlayerColoredPlatformCollisionDetector collisionDetector))
@@ -131,6 +138,7 @@ namespace Game.Level
                         break;
                     case PointCollectible:
                         collectible.OnCollectibleCollected += OnPointCollected;
+                        m_maxPoints++;
                         break;
                 }
             }
@@ -185,7 +193,7 @@ namespace Game.Level
             m_playerMovement.EnableAutoRun();
             m_playerVisual.SetActive(true);
             m_playerCollisionDetector.ResetCacheAndCollisions();
-            m_playerColorHandler.SetColor(m_initialPlatformColor);
+            m_playerColorHandler.SetInitialColor(m_initialPlatformColor);
             TeleportPlayerToStart();
             m_playerInputHandler.EnableAllInputs();
             m_hasLost = false;
@@ -212,6 +220,8 @@ namespace Game.Level
         {
             if (!m_hasLost)
             {
+                OnLevelWon?.Invoke();
+                
                 m_playerInputHandler.DisableAllInputs();
                 m_playerMovement.StopAutoRun();
                 m_transitionManager.PlayFinishLevelTransition();
@@ -223,7 +233,7 @@ namespace Game.Level
         {
             float timeElapsed = 0f;
             
-            while (timeElapsed < transitionDuration)
+            while (timeElapsed < transitionDuration && m_hasLost)
             {
                 timeElapsed += Time.deltaTime;
                 Time.timeScale = Mathf.Clamp(originTimeScale, targetTimeScale, timeElapsed / transitionDuration);
@@ -240,18 +250,31 @@ namespace Game.Level
 
         private void OnFinishLevelTransitionFinished()
         {
-            Debug.Log("[Level Manager] Win");
+            GameObject victoryScreenInstance = Instantiate(m_victoryScreenPrefab, m_mainUICanvas.transform);
+
+            victoryScreenInstance.TryGetComponent(out VictoryScreen victoryScreen);
             
-            if (m_sceneManager!= null && !m_sceneManager.ActivatePreloadedScene())
+            if (victoryScreen != null)
             {
-                if (m_nextLevel != null)
+                if (m_maxPoints > 0)
                 {
-                    m_sceneManager.LoadScene(m_nextLevel);
+                    victoryScreen.ShowCollectibleMessage(m_currentPoints, m_maxPoints);
                 }
-                else
+                
+                victoryScreen.OnCountdownFinished += () =>
                 {
-                    Debug.Log("[Level Manager] Level could not be loaded");
-                }
+                    if (m_sceneManager && !m_sceneManager.ActivatePreloadedScene())
+                    {
+                        if (m_nextLevel != null)
+                        {
+                            m_sceneManager.LoadScene(m_nextLevel);
+                        }
+                        else
+                        {
+                            Application.Quit();
+                        }
+                    }
+                };
             }
         }
     }

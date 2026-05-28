@@ -57,7 +57,7 @@ namespace Game.Player
 
             if (m_playerColorHandler)
             {
-                m_playerColorHandler.OnColorSwitched += newColor =>
+                m_playerColorHandler.OnColorSwitched += (newColor, _) =>
                 {
                     ModifyParticlesColor(m_colorDustParticles, newColor);
                     ModifyParticlesColor(m_changeColorParticles, newColor);
