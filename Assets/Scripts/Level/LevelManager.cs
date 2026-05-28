@@ -24,6 +24,7 @@ namespace Game.Level
         
         [SerializeField] private PlatformColor m_initialPlatformColor = PlatformColor.Blue;
         [SerializeField] private TransitionManager m_transitionManager;
+        [SerializeField] private GameObject m_touchingCanvas;
         
         [Header("Settings")]
         [SerializeField] private float m_loseTimeScale = 0.2f;
@@ -43,57 +44,82 @@ namespace Game.Level
         {
             m_transitionManager.FadeOutInmmediatly();
             m_transitionManager.FadeIn();
-            
-            KillZoneBehaviour[] killZones = FindObjectsOfType<KillZoneBehaviour>();
-            Collectible[] collectibles = FindObjectsOfType<Collectible>();
-            MovingPlatformComponent[] movingPlatforms = FindObjectsOfType<MovingPlatformComponent>();
-            
 
+            CheckTouchingCanvasActivation(m_touchingCanvas);
+
+            BindKillZonesEvents();
+            BindCollectibleEvents();
+            BindMovingPlatformsEvents();
+
+            PreloadNextScene();
+
+            BindPlayerEventsAndInitializeVariables();
+        }
+
+        private void Start()
+        {
+            StartLevel();
+        }
+
+        private void PreloadNextScene()
+        {
             if (m_nextLevel != null && m_sceneManager != null)
             {
                 m_sceneManager.PreloadScene(m_nextLevel);
             }
+        }
+
+        private void BindPlayerEventsAndInitializeVariables()
+        {
+            if (m_player == null) return;
             
-            if (m_player != null)
+            if (m_player.TryGetComponent(out PlayerColoredPlatformCollisionDetector collisionDetector))
             {
-                if (m_player.TryGetComponent(out PlayerColoredPlatformCollisionDetector collisionDetector))
-                {
-                    m_playerCollisionDetector = collisionDetector;
-                    collisionDetector.OnPlayerCollidedPlatformWithIncorrectColor += OnLose;
-                }
-                else
-                {
-                    PlayerColoredPlatformCollisionDetector childrenCollisionDetector =
-                        m_player.GetComponentInChildren<PlayerColoredPlatformCollisionDetector>();
+                m_playerCollisionDetector = collisionDetector;
+                collisionDetector.OnPlayerCollidedPlatformWithIncorrectColor += OnLose;
+            }
+            else
+            {
+                PlayerColoredPlatformCollisionDetector childrenCollisionDetector =
+                    m_player.GetComponentInChildren<PlayerColoredPlatformCollisionDetector>();
 
-                    if (childrenCollisionDetector != null)
-                    {
-                        m_playerCollisionDetector = childrenCollisionDetector;
-                        childrenCollisionDetector.OnPlayerCollidedPlatformWithIncorrectColor += OnLose;
-                    }
-                }
-
-                if (m_player.TryGetComponent(out PlayerColorHandler playerColorHandler))
+                if (childrenCollisionDetector != null)
                 {
-                    m_playerColorHandler = playerColorHandler;
+                    m_playerCollisionDetector = childrenCollisionDetector;
+                    childrenCollisionDetector.OnPlayerCollidedPlatformWithIncorrectColor += OnLose;
                 }
+            }
 
-                if (m_player.TryGetComponent(out PlayerInputHandler playerInputHandler))
-                {
-                    m_playerInputHandler = playerInputHandler;
-                }
+            if (m_player.TryGetComponent(out PlayerColorHandler playerColorHandler))
+            {
+                m_playerColorHandler = playerColorHandler;
+            }
+
+            if (m_player.TryGetComponent(out PlayerInputHandler playerInputHandler))
+            {
+                m_playerInputHandler = playerInputHandler;
+            }
                 
-                if (m_player.TryGetComponent(out PlayerMovement playerMovement))
-                {
-                    m_playerMovement = playerMovement;
-                }
-            }
-
-            foreach (KillZoneBehaviour killzone in killZones)
+            if (m_player.TryGetComponent(out PlayerMovement playerMovement))
             {
-                killzone.OnPlayerEnteredKillZone += OnLose;
+                m_playerMovement = playerMovement;
             }
+        }
+        
+        private void BindMovingPlatformsEvents()
+        {
+            MovingPlatformComponent[] movingPlatforms = FindObjectsOfType<MovingPlatformComponent>();
             
+            foreach (MovingPlatformComponent movingPlatformComponent in movingPlatforms)
+            {
+                OnLevelStarted += movingPlatformComponent.ResetPosition;
+            }
+        }
+        
+        private void BindCollectibleEvents()
+        {
+            Collectible[] collectibles = FindObjectsOfType<Collectible>();
+
             foreach (Collectible collectible in collectibles)
             {
                 OnLevelStarted += collectible.Activate;
@@ -108,16 +134,24 @@ namespace Game.Level
                         break;
                 }
             }
-            
-            foreach (MovingPlatformComponent movingPlatformComponent in movingPlatforms)
+        }
+        
+        private void BindKillZonesEvents()
+        {
+            KillZoneBehaviour[] killZones = FindObjectsOfType<KillZoneBehaviour>();
+
+            foreach (KillZoneBehaviour killZone in killZones)
             {
-                OnLevelStarted += movingPlatformComponent.ResetPosition;
+                killZone.OnPlayerEnteredKillZone += OnLose;
             }
         }
-
-        private void Start()
+        
+        private void CheckTouchingCanvasActivation(GameObject touchingCanvas)
         {
-            StartLevel();
+            if (!Application.isMobilePlatform)
+            {
+                touchingCanvas.SetActive(false);
+            }
         }
 
         private void TeleportPlayerToStart()
@@ -174,7 +208,18 @@ namespace Game.Level
             m_transitionManager.OnResetLevelTransitionFinished += OnResetLevelTransitionFinished;
         }
 
-        IEnumerator ChangeTimeScale(float originTimeScale, float targetTimeScale, float transitionDuration = 0.2f)
+        private void OnWin()
+        {
+            if (!m_hasLost)
+            {
+                m_playerInputHandler.DisableAllInputs();
+                m_playerMovement.StopAutoRun();
+                m_transitionManager.PlayFinishLevelTransition();
+                m_transitionManager.OnFinishLevelTransitionFinished += OnFinishLevelTransitionFinished;    
+            }
+        }
+
+        private IEnumerator ChangeTimeScale(float originTimeScale, float targetTimeScale, float transitionDuration = 0.2f)
         {
             float timeElapsed = 0f;
             
@@ -186,17 +231,6 @@ namespace Game.Level
             }
             
             Time.timeScale = targetTimeScale;
-        }   
-
-        private void OnWin()
-        {
-            if (!m_hasLost)
-            {
-                m_playerInputHandler.DisableAllInputs();
-                m_playerMovement.StopAutoRun();
-                m_transitionManager.PlayFinishLevelTransition();
-                m_transitionManager.OnFinishLevelTransitionFinished += OnFinishLevelTransitionFinished;    
-            }
         }
 
         private void OnPointCollected()
