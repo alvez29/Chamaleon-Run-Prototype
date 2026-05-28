@@ -8,14 +8,14 @@ namespace Game.Player
     {
         public event Action<PlatformColor> OnColorSwitched; 
         
-        [SerializeField] PlayerInputHandler m_playerInputHandler;
-        [SerializeField] Renderer[] m_visuals;
+        [SerializeField] private PlayerInputHandler m_playerInputHandler;
+        [SerializeField] private Renderer[] m_visuals;
         
-        [SerializeField] Material m_blueMaterial;
-        [SerializeField] Material m_yellowMaterial;
+        [SerializeField] private Material m_blueMaterial;
+        [SerializeField] private Material m_yellowMaterial;
         
-        public bool isYellow;
-        public PlatformColor CurrentColor => isYellow ? PlatformColor.Yellow : PlatformColor.Blue;
+        public bool m_isYellow;
+        public PlatformColor CurrentColor => m_isYellow ? PlatformColor.Yellow : PlatformColor.Blue;
         
         private void Awake()
         {
@@ -38,13 +38,13 @@ namespace Game.Player
         
         public void SetColor(PlatformColor color)
         {
-            isYellow = color == PlatformColor.Yellow;
+            m_isYellow = color == PlatformColor.Yellow;
             UpdateMaterial(m_visuals, CurrentColor);
         }
         
         private void SwitchColor()
         {
-            isYellow = !isYellow;
+            m_isYellow = !m_isYellow;
             UpdateMaterial(m_visuals, CurrentColor);
         }
         

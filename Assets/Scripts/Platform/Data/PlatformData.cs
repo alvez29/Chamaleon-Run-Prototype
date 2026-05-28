@@ -12,20 +12,25 @@ namespace Game.Level.Data
             Barrier,
             NonRegistered,
         }
+
+        [SerializeField] private PlatformColor m_color = PlatformColor.Black;
+
+        [SerializeField] private GameObject m_platformPrefab;
+
+        [SerializeField] private Vector3Int m_dimensions = Vector3Int.one;
+
+        [SerializeField] private bool m_useMeshCollider;
+
+        [SerializeField] private PlatformType m_type = PlatformType.Squared;
         
-        [SerializeField] 
-        public PlatformColor Color = PlatformColor.Black;
-        
-        [SerializeField] 
-        public GameObject PlatformPrefab;
-        
-        [SerializeField]
-        public Vector3Int Dimensions = Vector3Int.one;
-        
-        [SerializeField] 
-        public bool UseMeshCollider;
-        
-        [SerializeField]
-        public PlatformType Type = PlatformType.Squared;
+        public PlatformColor Color => m_color;
+
+        public GameObject PlatformPrefab => m_platformPrefab;
+
+        public Vector3Int Dimensions => m_dimensions;
+
+        public bool UseMeshCollider => m_useMeshCollider;
+
+        public PlatformType Type => m_type;
     }
 }
