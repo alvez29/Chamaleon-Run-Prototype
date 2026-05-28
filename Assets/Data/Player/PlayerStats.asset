@@ -12,16 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59490d9f90c11ea449a4b001deb3c3ab, type: 3}
   m_Name: PlayerStats
   m_EditorClassIdentifier: 
-  RunSpeed: 40
-  RunAcceleration: 10
-  InitialJumpHeight: 11
-  DoubleJumpHeight: 6.4
-  FallGravityFactor: 8
-  JumpGravityFactor: 3
-  BaseGravity: 9.8
-  GroundCheckDistance: 0.1
-  GroundCheckRadius: 0.3
-  GroundCheckOffset: {x: 0, y: 0, z: 0}
-  GroundLayer:
+  m_runSpeed: 40
+  m_initialJumpHeight: 11
+  m_doubleJumpHeight: 6.4
+  m_fallGravityFactor: 8
+  m_jumpGravityFactor: 3
+  m_baseGravity: 9.8
+  m_groundCheckDistance: 0.1
+  m_groundCheckRadius: 0.3
+  m_groundCheckOffset: {x: 0, y: 0.1, z: 0}
+  m_groundLayer:
     serializedVersion: 2
     m_Bits: 64

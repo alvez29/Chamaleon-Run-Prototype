@@ -4882,7 +4882,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: WinCollectible
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1152826538408683778, guid: cfd86de99b879744d80e1f6b9477a935, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 744995949412958304, guid: cfd86de99b879744d80e1f6b9477a935, type: 3}
@@ -4892,6 +4893,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7632851503799027264, guid: cfd86de99b879744d80e1f6b9477a935, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1668308375737634575}
+    - targetCorrespondingSourceObject: {fileID: 7632851503799027264, guid: cfd86de99b879744d80e1f6b9477a935, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2126975559408172726}
   m_SourcePrefab: {fileID: 100100000, guid: cfd86de99b879744d80e1f6b9477a935, type: 3}
 --- !u!1 &1652601577862980255 stripped
 GameObject:
@@ -4911,6 +4915,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   onCollectedParticles: {fileID: 7069687097615336728}
+--- !u!114 &2126975559408172726
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1652601577862980255}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8bb99cb05494215b84c2f0ba35ff4fe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_collectible: {fileID: 1668308375737634575}
+  m_onCollectedSound: {fileID: 8300000, guid: 5017d9895a098694bab570eae6430d70, type: 3}
 --- !u!198 &7069687097615336728 stripped
 ParticleSystem:
   m_CorrespondingSourceObject: {fileID: 2098392192316662215, guid: cfd86de99b879744d80e1f6b9477a935, type: 3}

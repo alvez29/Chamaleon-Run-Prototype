@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 496a5a20ae864f9b8ee8261ce6cdc045, type: 3}
   m_Name: CameraData
   m_EditorClassIdentifier: 
-  m_offset: {x: 5, y: 5, z: -25}
+  m_offset: {x: -1, y: 5, z: -25}
   m_smoothTime: {x: 0.1, y: 0.1}
   m_rotationInDegrees: 35
