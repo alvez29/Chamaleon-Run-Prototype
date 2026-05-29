@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -15,10 +15,13 @@ namespace Game.UI
         [SerializeField] private float m_loadingMessageAnimationRate = 0.3f;
         [SerializeField] private float m_waitTime = 5f;
 
+        private WaitForSeconds m_animationDelay;
+
         private void Awake()
         {
             m_animator.Play("FadeInVictoryScreen");
-            StartCoroutine(LoadingScreenAnimation(m_loadingMessageAnimationRate));
+            m_animationDelay = new WaitForSeconds(m_loadingMessageAnimationRate);
+            StartCoroutine(LoadingScreenAnimation());
             StartCoroutine(CountdownToNextLevel(m_waitTime));
         }
 
@@ -34,7 +37,7 @@ namespace Game.UI
             OnCountdownFinished?.Invoke();
         }
         
-        private IEnumerator LoadingScreenAnimation(float rate)
+        private IEnumerator LoadingScreenAnimation()
         {
             string[] frames = { "", ".", "..", "..." };
             string originalText = m_loadingMessage.text;
@@ -44,7 +47,7 @@ namespace Game.UI
             {
                 m_loadingMessage.text = originalText + frames[index];
                 index = (index + 1) % frames.Length;
-                yield return new WaitForSeconds(rate);
+                yield return m_animationDelay;
             }
         }
 
