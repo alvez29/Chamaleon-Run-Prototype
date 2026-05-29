@@ -14,7 +14,7 @@ namespace Game.Player
         [SerializeField] private Material m_blueMaterial;
         [SerializeField] private Material m_yellowMaterial;
         
-        public bool m_isYellow;
+        private bool m_isYellow;
         public PlatformColor CurrentColor => m_isYellow ? PlatformColor.Yellow : PlatformColor.Blue;
         
         private void Awake()

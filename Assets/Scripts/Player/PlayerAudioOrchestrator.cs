@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Game.Level;
 using Game.Manager;
 using UnityEngine;
@@ -22,7 +22,7 @@ namespace Game.Player
             if (m_playerMovement)
             {
                 m_playerMovement.OnJumpExecuted += () => AudioManager.Instance.PlaySFX(m_jumpSound);
-                m_playerMovement.OnDoubleJumpExecuted += () => AudioManager.Instance.PlaySFX(m_jumpSound);;
+                m_playerMovement.OnDoubleJumpExecuted += () => AudioManager.Instance.PlaySFX(m_jumpSound);
             }
 
             if (m_groundDetector)

@@ -62,7 +62,13 @@ namespace Game.Level.Platforms
 
         public void ResetPosition()
         {
-            m_rigidbody.position = m_waypoints[0].position;
+            if (m_waypoints != null && m_waypoints.Count > 0 && m_waypoints[0] != null)
+            {
+                m_rigidbody.position = m_waypoints[0].position;
+            }
+            m_currentWaypointIndex = 0;
+            m_movingForward = true;
+            m_waitTimer = 0f;
         }
 
         private void UpdateWaypointIndex()

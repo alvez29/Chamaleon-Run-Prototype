@@ -32,10 +32,11 @@ namespace Game.Player
 
         private void OnDrawGizmos()
         {
+            if (m_stats == null) return;
+
             Gizmos.color = IsGrounded ? Color.green : Color.red;
-            Vector3 origin = transform.position + m_stats?.GroundCheckOffset ?? Vector3.zero;
-            Gizmos.DrawWireSphere(origin + Vector3.down * m_stats?.GroundCheckDistance ?? Vector3.zero,
-                m_stats?.GroundCheckRadius ?? 0.0f);
+            Vector3 origin = transform.position + m_stats.GroundCheckOffset;
+            Gizmos.DrawWireSphere(origin + Vector3.down * m_stats.GroundCheckDistance, m_stats.GroundCheckRadius);
         }
     }
 }
