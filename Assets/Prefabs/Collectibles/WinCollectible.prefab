@@ -4884,6 +4884,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 1152826538408683778, guid: cfd86de99b879744d80e1f6b9477a935, type: 3}
+    - {fileID: 8175791070501857210, guid: cfd86de99b879744d80e1f6b9477a935, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 744995949412958304, guid: cfd86de99b879744d80e1f6b9477a935, type: 3}
@@ -4896,6 +4897,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7632851503799027264, guid: cfd86de99b879744d80e1f6b9477a935, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2126975559408172726}
+    - targetCorrespondingSourceObject: {fileID: 7632851503799027264, guid: cfd86de99b879744d80e1f6b9477a935, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8139145689470001930}
   m_SourcePrefab: {fileID: 100100000, guid: cfd86de99b879744d80e1f6b9477a935, type: 3}
 --- !u!1 &1652601577862980255 stripped
 GameObject:
@@ -4929,6 +4933,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_collectible: {fileID: 1668308375737634575}
   m_onCollectedSound: {fileID: 8300000, guid: 5017d9895a098694bab570eae6430d70, type: 3}
+--- !u!136 &8139145689470001930
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1652601577862980255}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 2
+  m_Height: 30
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!198 &7069687097615336728 stripped
 ParticleSystem:
   m_CorrespondingSourceObject: {fileID: 2098392192316662215, guid: cfd86de99b879744d80e1f6b9477a935, type: 3}
