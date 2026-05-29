@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Game.Manager;
 using UnityEngine;
 
@@ -8,7 +8,7 @@ namespace Game.Level.Collectibles
     {
         [SerializeField] private Collectible m_collectible;
 
-        [SerializeField] private AudioClip m_onCollectedSound ;
+        [SerializeField] private AudioClip m_onCollectedSound;
         
         private void Awake()
         {

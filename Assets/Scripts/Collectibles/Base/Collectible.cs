@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Game.Utils;
 using UnityEngine;
 
@@ -21,7 +21,7 @@ namespace Game.Level.Collectibles
 
         private void OnTriggerEnter(Collider other)
         {
-            if (m_isActivated && ((1 << other.gameObject.layer) & PLAYER_LAYER) == 0)
+            if (m_isActivated && other.gameObject.layer == PLAYER_LAYER)
             {
                 OnCollected(other.gameObject);
                 onCollectedParticles.Play();

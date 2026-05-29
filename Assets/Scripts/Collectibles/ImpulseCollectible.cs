@@ -1,4 +1,4 @@
-﻿using Game.Player;
+using Game.Player;
 using UnityEngine;
 
 namespace Game.Level.Collectibles
@@ -21,6 +21,7 @@ namespace Game.Level.Collectibles
 
             if (other.TryGetComponent(out PlayerMovement playerMovement))
             {
+                m_playerMovement = playerMovement;
                 playerMovement.StartSpeedUp(m_speedUpTime, m_speedFactor);
             }
         }
