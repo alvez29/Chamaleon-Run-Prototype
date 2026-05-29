@@ -43,7 +43,6 @@ namespace Game.Level
 
         private int m_currentPoints;
         private int m_maxPoints;
-        private bool m_hasLevelStarted;
         
         private void Awake()
         {
@@ -76,8 +75,6 @@ namespace Game.Level
 
         private void BindPlayerEventsAndInitializeVariables()
         {
-            m_hasLevelStarted = false;
-            
             if (m_player == null) return;
             
             if (m_player.TryGetComponent(out PlayerColoredPlatformCollisionDetector collisionDetector))
@@ -236,7 +233,7 @@ namespace Game.Level
             while (timeElapsed < transitionDuration && m_hasLost)
             {
                 timeElapsed += Time.deltaTime;
-                Time.timeScale = Mathf.Clamp(originTimeScale, targetTimeScale, timeElapsed / transitionDuration);
+                Time.timeScale = Mathf.Lerp(originTimeScale, targetTimeScale, timeElapsed / transitionDuration);
                 yield return null;
             }
             

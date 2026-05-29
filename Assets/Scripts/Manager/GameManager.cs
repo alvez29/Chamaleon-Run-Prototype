@@ -19,11 +19,6 @@ namespace Game.Manager
                 return m_instance;
             }
         }
-
-        private KillZoneBehaviour[] m_killzones;
-        
-        [SerializeField] private GameObject m_player;
-        [SerializeField] private LevelManager m_currentLevel;
         
         [SerializeField] private int m_targetFps = 60;
 

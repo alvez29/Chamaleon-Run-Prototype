@@ -27,6 +27,9 @@ namespace Game.Manager
         [SerializeField] private AudioSource m_stepsSource;
 
         private Coroutine m_fadeInWindCoroutine;
+        private float m_defaultSFXVolume = 1f;
+        private float m_defaultWindVolume = 0.05f;
+        private float m_defaultStepsVolume = 0.2f;
         
         private void Awake()
         {
@@ -44,17 +47,20 @@ namespace Game.Manager
             {
                 m_sfxSource = gameObject.AddComponent<AudioSource>();
             }
+            m_defaultSFXVolume = m_sfxSource.volume > 0 ? m_sfxSource.volume : 1f;
 
             if (m_windSource == null)
             {
                 m_windSource = gameObject.AddComponent<AudioSource>();
                 m_windSource.playOnAwake = false;
             }
+            m_defaultWindVolume = m_windSource.volume > 0 ? m_windSource.volume : 0.05f;
 
             if (m_stepsSource == null)
             {
                 m_stepsSource = gameObject.AddComponent<AudioSource>();
             }
+            m_defaultStepsVolume = m_stepsSource.volume > 0 ? m_stepsSource.volume : 0.2f;
         }
 
         public void SetVFXVolume(float volume)
@@ -104,9 +110,9 @@ namespace Game.Manager
 
         public void RestoreSoundVolume()
         {
-            m_sfxSource.volume = 1.0f;
-            m_windSource.volume = 1.0f;
-            m_stepsSource.volume = 1.0f;
+            m_sfxSource.volume = m_defaultSFXVolume;
+            m_windSource.volume = m_defaultWindVolume;
+            m_stepsSource.volume = m_defaultStepsVolume;
         }
         
         public void StopWindSound()

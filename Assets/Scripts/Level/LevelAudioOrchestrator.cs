@@ -1,8 +1,8 @@
-﻿using Game.Level;
+using Game.Level;
 using Game.Manager;
 using UnityEngine;
 
-namespace Game.Player
+namespace Game.Level
 {
     public class LevelAudioOrchestrator : MonoBehaviour
     {
